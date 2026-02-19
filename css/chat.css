@@ -429,6 +429,7 @@ header button:hover
     display:none;
     position: absolute;
     font-size: 20px;
+    font-weight: bold;
     border: none;
     border-radius: 20px;
     padding: 5px 10px;
