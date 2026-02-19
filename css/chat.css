@@ -1,0 +1,593 @@
+
+/******************** colors ********************************/
+
+
+:root
+{
+    --bg: #e6e9e9;
+    --c1: #17407a;      /*main color*/
+    --c2: #286892;      /*aux color*/
+    --c3: #a1a1a1;      /*selected message*/
+    --c4: #f1f1f1;      /*message box*/
+    --c5: #c6c6c6;      /*shadows*/
+    --c6: #2b2b2b;      /*dark text*/
+    --c7: #a1a1a1;      /*msg hour*/
+    --c8: #90B2B4;      /*write box*/  
+    --c9: #5786a5;      /*light blue*/
+    --c10: #163257;     /*darker c1*/
+}
+
+.dark
+{
+    --bg: #1d232b;
+    --c1: #233b5c;
+    --c2: #5786a5;
+    --c3: #3f4c5c;
+    --c4: #4e6174;
+    --c5: #181818;
+    --c6: #dddddd;
+    --c7: #9facb9;
+    --c8: #334f66;
+    --c10: #182341;
+}
+
+*
+{
+    transition: background-color 0.1s ease, color 0.1s ease;
+}
+
+
+/***********************************************************/
+
+
+body
+{
+    display: grid;
+    grid-template-columns: 25% 75%;
+
+    width: 90vw;
+
+    gap: 20px;
+    background-color: var(--bg);
+    padding: 20px;
+    font-family:  "Inter", sans-serif;
+}
+
+.blur
+{
+    filter: blur(5px);
+}
+
+/************************* side bar *************************/
+
+
+aside
+{   
+    grid-column: 1;
+    grid-row: 1 / 4;
+    background-color: var(--c1);
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px 5px;
+    border-radius: 20px;
+}
+
+.userCount
+{   
+    display: flex;
+    justify-content: space-between;
+    width: 90%;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.userCount span
+{
+    font-size: 24px;
+}
+
+.userBoxContainer
+{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    height: 60vh;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.userBox
+{   
+    padding: 0px 5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+    height: 50px;
+    border-radius: 10px;
+    border-bottom: 2px solid var(--c2);
+
+    /*
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    */
+}
+
+/*
+.userBox.new {
+    opacity: 0;
+    transform: translateX(-50px);
+}
+    */
+
+.userBox:hover
+{
+    background-color: #5786a5;
+}
+
+.userBox.selected
+{
+    background-color: #5786a5;
+}
+
+.userBoxPhoto
+{
+    width: 40px;
+}
+
+.userBoxPhoto img {
+    width: 30px;
+    height: 30px;
+}
+
+.userBoxName
+{
+    flex: 1;
+    color: white;
+}
+
+.userBoxStatus
+{   
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+}
+
+.statusDot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+}
+
+.statusDot.online {
+    background-color: #10c510;
+}
+
+.statusDot.offline {
+    background-color: #d41111;
+}
+
+.deleteUserBtn {
+    display: block;
+    position: absolute;
+    padding: 8px 12px;
+    background-color: #961e1e;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    opacity: 0;
+    transition: left 0.1s ease, opacity 0.1s ease;
+}
+
+.deleteUserBtn:hover
+{
+    background-color: #691414;
+}
+
+.deleteUserBtn.selected {
+    opacity: 1;
+}
+
+.userInfo
+{
+    display: flex;
+    width: 95%;
+
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px;
+    gap: 5px;
+
+    border-radius: 10px;
+    border-top: 2px solid #6ea5ec;
+}
+
+#profileBtn
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--c1);
+    flex-shrink: 0;
+    width: 50px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    border: 1px solid black;
+    color: var(--c4);
+    padding: 0px;
+}
+
+#profileBtn:hover
+{
+    background-color: white;
+}
+
+#profileBtn img
+{
+    width: 100%;
+    height: 100%;
+}
+
+#userDetails
+{   
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    grid-template-rows: auto auto;
+    text-align: left;
+    align-items: center;
+    flex-grow: 1;
+    background-color: transparent;
+    border-radius: 10px;
+    border: none;
+    color: white;
+    gap: 5px;
+    padding: 10px;
+}
+
+#userDetails:hover
+{   
+    background-color: var(--c10);
+}
+
+#userName
+{
+    grid-column: 1 / span 12;
+    font-size: 24px;
+}
+
+#statusDot
+{
+    grid-column: 1 / span 1;
+    width: 10px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+}
+
+#statusDot.online {
+    background-color: green;
+    border-color: green;
+}
+
+#statusDot.away {
+    background-color: orange;
+    border-color: orange;
+}
+
+#statusDesc
+{
+    grid-column: 2 / span 11;
+    font-size: 12px;
+}
+
+
+#logoutButton
+{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    aspect-ratio: 1/1;
+    background-color: transparent;
+    padding: 10px;
+    border: none;
+}
+
+
+#logoutButton:hover
+{
+    background-color: var(--c10);
+}
+
+#logoutButton img
+{
+    width: 20px;
+    aspect-ratio: 1/1;
+}
+
+/************************* header ****************************/
+
+
+header
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    height: 60px;
+
+    padding: 5px 15px;
+
+    border-bottom: 3px solid var(--c1);
+}
+
+header img
+{
+    flex: 0 0 auto;
+}
+
+header button
+{   
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+
+    background-color: var(--c1);
+    border: none;
+    flex: 0 0 auto;
+    width: 8%;
+    min-width: 50px;
+    max-width: 60px;
+    box-sizing: border-box;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    color: var(--c4);
+    padding: 8px;
+}
+
+header button img
+{
+    width: 90%;
+    height: 90%;
+}
+
+header button:hover
+{
+  background-color: color-mix(in srgb, var(--c1) 85%, black);
+}
+
+/************************ chat ***************************/
+
+
+.chat 
+{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+
+    height: 60vh;
+    overflow-y: auto;
+    padding: 8px;
+}
+
+
+.msgBox
+{
+    display: grid;
+    grid-template-columns: auto 1fr;
+    width: fit-content;
+    max-width: 60%;
+    padding: 10px;
+    gap: 10px;
+    border-radius: 20px;
+}
+
+.msgBox.sent
+{
+    align-self: flex-end;
+}
+
+.msgBox.received
+{
+    align-self: flex-start;
+}
+
+.msgBox.selected
+{   
+    background-color: var(--c3);
+}
+
+#delBtn
+{
+    display:none;
+    position: absolute;
+    font-size: 20px;
+    border: none;
+    border-radius: 20px;
+    padding: 5px 10px;
+    background-color: var(--c3);
+    color: var(--c6);
+}
+
+#delBtn:hover
+{
+    background-color: color-mix(in srgb, var(--c3) 85%, black); 
+}
+
+/*
+.msgBoxPhoto
+{
+    grid-column: 1;
+    justify-self: center;
+    align-self: center;
+    max-width: 30px;
+    max-height: 30px;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: red;
+}
+    */
+
+        
+.msgBoxMessage
+{   
+    grid-column: 2;
+
+    
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+
+    background-color: var(--c4);
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px 0px var(--c5);
+    padding: 10px;
+
+    width: fit-content;
+    max-width: 100%;
+    word-break: break-word;
+}
+
+
+.msgBoxUser {
+    font-size: 20px;
+    font-weight: bold;
+    color: var(--c6);
+    margin-bottom: 0.5vh;
+}
+        
+.msgBoxText {
+    font-size: 20px;
+    word-break: break;
+    margin-bottom: 2vh;
+    color: var(--c6);
+}
+
+.msgBoxHour {
+    font-size: 12px;
+    justify-self: end;
+    color: var(--c7);
+}
+
+    
+/*=============================================================*/
+
+
+
+/********************** input *********************************/
+
+.writeArea
+{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-self: center;
+    box-sizing: border-box;
+
+    height: 8vh;
+    min-height: 70px;
+    padding: 0px 15px;
+    gap: 20px;
+    align-items:flex-end;
+}   
+
+.writeArea input
+{
+    background-color: var(--c8);
+    color: var(--c6);
+    border: none;
+    align-self: center;
+    height: 50%;
+    flex: 1;
+    justify-content: end;
+    border-radius: 15px;
+    padding: 8px 20px;
+}
+
+.writeArea button
+{   
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+    align-self: center;
+
+    background-color: var(--c1);
+    border: none;
+    width: 4vw;
+    min-width: 50px;
+    max-width: 60px;
+    aspect-ratio: 1/1;
+    border-radius: 50%;
+    color: var(--c4);
+    padding: 8px;
+}
+
+.writeArea button svg
+{
+    width: 90%;
+    height: 90%;
+    fill: white;
+}
+
+.writeArea button:hover
+{
+    background-color: color-mix(in srgb, var(--c1) 85%, black);
+}
+
+
+
+/****************** pop-ups ****************************/
+
+
+.alertOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.exitContent {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.exitContent button
+{
+    border:none;
+    border-radius: 5px;
+    font-weight: bold;
+    margin: 0px 10px;
+    padding: 6px 10px;
+}
+
+.exitContent button:hover
+{
+    filter:brightness(0.9);
+}
+
+#confirmLogout
+{
+    background-color: rgb(255, 40, 40);
+}
+
+
+.profileContent
+{
+    background: blue;
+}
+
+
+
+
