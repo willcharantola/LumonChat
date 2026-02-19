@@ -255,7 +255,11 @@ confirmLogout.addEventListener("click", () => {
 });
 
 
-
+fetch("assets/logo.svg")
+  .then(res => res.text())
+  .then(svg => {
+    document.querySelector(".logo").innerHTML = svg;
+});
 
 
 

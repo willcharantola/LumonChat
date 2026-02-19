@@ -15,6 +15,10 @@
     --c8: #90B2B4;      /*write box*/  
     --c9: #5786a5;      /*light blue*/
     --c10: #163257;     /*darker c1*/
+
+    --c11: #17407a;     /*logo ballon*/
+    --c12:  #f3f3f3;    /*logo tear*/
+    --c13: #17407a;     /*logo text*/
 }
 
 .dark
@@ -29,6 +33,8 @@
     --c7: #9facb9;
     --c8: #334f66;
     --c10: #182341;
+
+    --c13: #f3f3f3;
 }
 
 *
@@ -317,19 +323,34 @@ header
 {
     display: flex;
     flex-direction: row;
+    align-items: center;
     justify-content: space-between;
 
     height: 60px;
 
     padding: 5px 15px;
 
-    border-bottom: 3px solid var(--c1);
+    border-bottom: 4px solid var(--c1);
 }
 
-header img
+.logo
 {
-    flex: 0 0 auto;
+    width: 150px;
 }
+
+.logo-bg {
+    fill: var(--c11);
+    stroke: var(--c11);
+}
+
+.logo-text {
+    fill: var(--c13);
+}
+
+.logo-icon {
+    fill: var(--c12);
+}
+
 
 header button
 {   
@@ -337,7 +358,6 @@ header button
 
     justify-content: center;
     align-items: center;
-    align-self: center;
 
     background-color: var(--c1);
     border: none;
