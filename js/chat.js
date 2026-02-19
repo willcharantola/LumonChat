@@ -249,6 +249,14 @@ alertBox.addEventListener("click", (e) => {
 });
 
 
+const confirmLogout = document.getElementById("confirmLogout");
+confirmLogout.addEventListener("click", () => {
+    window.location.href = "login.html";
+});
+
+
+
+
 
 
 
