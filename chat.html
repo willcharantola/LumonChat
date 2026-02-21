@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 
 
   <head>
+
     <title> Lumon Chat </title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" href="css/chat.css">
@@ -15,7 +16,9 @@
   
   
   <body>
+    <h1> Lumon Chat </h1>
     <aside>
+      <h2> Barra de usuários </h2>
       <div class="userCount">
         <span>Usuários</span>
         <span id="counter">0</span>
@@ -26,8 +29,8 @@
       <button class="deleteUserBtn" id="delUserBtn"> Remover </button>
       
       <div class="userInfo">
-        <button id="profileBtn">
-          <img src="assets/user.png">
+        <button id="profileBtn" aria-label="Open profile">
+          <img src="assets/user.png" alt="">
         </button>
 
         <button id="userDetails">
@@ -36,8 +39,8 @@
           <div id="statusDesc">Online</div>
         </button>
 
-        <button id="logoutButton">
-          <img src="assets/logout.png">
+        <button id="logoutButton" aria-label="Botão de logout">
+          <img src="assets/logout.png" alt="">
         </button>
       </div>
 
@@ -48,24 +51,30 @@
       <div class="logo">
         
       </div>
-      <button id="switchThemeBtn">
-        <img src="assets/lightbulb.png">
+      <button id="switchThemeBtn" aria-label="Trocar tema claro/escuro">
+        <img src="assets/lightbulb.png" alt="">
       </button>
     </header>
 
     <main class="chat" id="mainChat">
-        <button id="delBtn">🗑</button>
+      <h2> Chat </h2>
+      <button id="delBtn">🗑</button>
     </main>
 
     
     <form class="writeArea">
-    	<input type="text" id="newMsg">
-        <button type="submit" id="sendButton">
-            <svg viewBox="0 0 24 24" class="icon">
-              <path
-                d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
-              </svg>
+
+      <h2> Caixa de texto </h2>
+
+      <label for="newMsg" class="hidden">Message</label>
+      <input type="text" id="newMsg" aria-label="Digite sua mensagem">
+      
+        <button type="submit" id="sendButton" aria-label="Enviar mensagem">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
+            </svg>
         </button>
+
     </form>
 
 

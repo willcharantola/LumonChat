@@ -128,6 +128,7 @@ function addUser(event)
     photo.classList.add("userBoxPhoto");
     const img = document.createElement("img");
     img.src = "../assets/user.png";
+    img.alt = "";
     photo.appendChild(img);
 
     const name = document.createElement("div");
