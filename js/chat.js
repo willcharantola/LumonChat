@@ -59,6 +59,8 @@ function createMessage(event)
     chat.appendChild(msgBox);
     chat.scrollTop = chat.scrollHeight;
 
+    const audio = document.getElementById("beep");
+    audio.play();
     input.focus();
     input.value="";
 }
