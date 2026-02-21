@@ -19,27 +19,27 @@
     <h1> Lumon Chat </h1>
     <aside>
       <h2> Barra de usuários </h2>
-      <div class="userCount">
+      <div class="userCount" aria-live="polite" tabindex="0">
         <span>Usuários</span>
-        <span id="counter">0</span>
+        <span id="counter" aria-live="polite">0</span>
       </div>
 
-      <div class="userBoxContainer" id="userList">
+      <div class="userBoxContainer" id="userList" aria-live="polite">
       </div>
       <button class="deleteUserBtn" id="delUserBtn"> Remover </button>
       
       <div class="userInfo">
-        <button id="profileBtn" aria-label="Open profile">
+        <button id="profileBtn" aria-label="Open profile" tabindex="0">
           <img src="assets/user.png" alt="">
         </button>
 
-        <button id="userDetails">
+        <button id="userDetails" tabindex="0">
           <div id="userName">User</div>
           <div id="statusDot" class="online"></div>
           <div id="statusDesc">Online</div>
         </button>
 
-        <button id="logoutButton" aria-label="Botão de logout">
+        <button id="logoutButton" aria-label="Botão de logout" tabindex="0">
           <img src="assets/logout.png" alt="">
         </button>
       </div>
@@ -51,14 +51,16 @@
       <div class="logo">
         
       </div>
-      <button id="switchThemeBtn" aria-label="Trocar tema claro/escuro">
+      <button id="switchThemeBtn" aria-label="Trocar tema claro/escuro" 
+      tabindex="0">
         <img src="assets/lightbulb.png" alt="">
       </button>
     </header>
 
-    <main class="chat" id="mainChat">
+    <main class="chat" id="mainChat" 
+      aria-live="polite" role="log" aria-relevant="additions" aria-atomic="false">
       <h2> Chat </h2>
-      <button id="delBtn">🗑</button>
+      <button id="delBtn" tabindex="0">🗑</button>
     </main>
 
     
@@ -80,14 +82,13 @@
 
     <button id="addUserButton"> Add User </button>
 
-    <div class="alertOverlay" id="alertBox">
+    <dialog id="alertBox" aria-labelledby="logoutTitle">
       <div class="exitContent">
-        <p>Tem certeza que deseja sair?</p>
-        <button id="cancelLogout"> Cancelar </button>
-        <button id="confirmLogout"> Sair </button>
+        <p id="logoutTitle">Tem certeza que deseja sair?</p>
+        <button id="cancelLogout">Cancelar</button>
+        <button id="confirmLogout">Sair</button>
       </div>
-    </div>
-
+    </dialog>
 
     <audio id="beep" src="assets/msgbeep.mp3"></audio>
 

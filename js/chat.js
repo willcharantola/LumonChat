@@ -56,7 +56,14 @@ function createMessage(event)
     bubble.append(user, text, hour);
     //msgBox.append(photo, bubble);
     msgBox.append(bubble);
+
+    msgBox.setAttribute("role", "article");
+    msgBox.setAttribute("aria-label",
+    `Nova mensagem de ${user.textContent}: ${msg}`
+    )
+
     chat.appendChild(msgBox);
+
     chat.scrollTop = chat.scrollHeight;
 
     const audio = document.getElementById("beep");
@@ -144,6 +151,7 @@ function addUser(event)
     status.appendChild(dot);
 
     newBox.append(photo, name, status);
+    newBox.tabIndex="0";
     container.appendChild(newBox);
 
     /*
@@ -219,42 +227,52 @@ function toggleStatus() {
     }
 }
 
+const dialog = document.getElementById("alertBox");
+const cancelBtn = document.getElementById("cancelLogout");
+const confirmBtn = document.getElementById("confirmLogout");
 
-
-
-const alertBox = document.getElementById("alertBox");
 logoutBtn.addEventListener("click", () => {
-
+    
     [...document.body.children].forEach(child => {
         if (child.id !== "alertBox") {
             child.classList.add("blur");
         }
     });
 
-    alertBox.style.display = "flex";
-
+    dialog.showModal();
 });
 
-const cancelLogout = document.getElementById("cancelLogout");
-cancelLogout.addEventListener("click", closeModal);
-function closeModal() {
-    alertBox.style.display = "none";
-
+cancelBtn.addEventListener("click", () => {
+    
     [...document.body.children].forEach(child => {
         child.classList.remove("blur");
     });
-}
+    
+    dialog.close();
+});
 
-alertBox.addEventListener("click", (e) => {
-    if (e.target === alertBox) {
-        closeModal();
+dialog.addEventListener("click", (e) => {
+
+        
+    [...document.body.children].forEach(child => {
+        child.classList.remove("blur");
+    });
+
+    if (e.target === dialog) {
+        dialog.close();
     }
+
+});
+
+dialog.addEventListener("close", () => {
+    [...document.body.children].forEach(child => {
+        child.classList.remove("blur");
+    });
 });
 
 
-const confirmLogout = document.getElementById("confirmLogout");
-confirmLogout.addEventListener("click", () => {
-    window.location.href = "login.html";
+confirmBtn.addEventListener("click", () => {
+  window.location.href = "login.html";
 });
 
 
