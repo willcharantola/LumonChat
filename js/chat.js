@@ -1,4 +1,4 @@
-
+import {fazerLogout} from './auth.js';
 
 const sendButton = document.getElementById("sendButton");
 const chat = document.getElementById("mainChat");
@@ -251,7 +251,7 @@ alertBox.addEventListener("click", (e) => {
 
 const confirmLogout = document.getElementById("confirmLogout");
 confirmLogout.addEventListener("click", () => {
-    window.location.href = "login.html";
+    fazerLogout();
 });
 
 

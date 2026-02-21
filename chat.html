@@ -8,7 +8,10 @@
     <link rel="stylesheet" href="css/chat.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="js/chat.js" defer></script>
+   <script type="module" src="js/chat.js" defer></script>
+      <script type="module" src="./js/config.js"></script>
+      <script type="module" src="./js/auth.js"></script>
+       <script type="module" src="./js/ui.js"></script>
 
   </head>
   
@@ -24,16 +27,17 @@
       </div>
       <button class="deleteUserBtn" id="delUserBtn"> Remover </button>
       
+     
       <div class="userInfo">
-        <button id="profileBtn">
-          <img src="assets/user.png">
-        </button>
+        <div id="profileBtn">
+          <img id="imgUser" class="imgUser">
+        </div>
 
-        <button id="userDetails">
-          <div id="userName">User</div>
+        <div id="userDetails">
+          <div id="userName"></div>
           <div id="statusDot" class="online"></div>
           <div id="statusDesc">Online</div>
-        </button>
+        </div>
 
         <button id="logoutButton">
           <img src="assets/logout.png">
@@ -44,7 +48,7 @@
 
 
     <header>
-      <img src="assets/logo.png">
+      <img src="assets/logocompletagotabranca.svg">
       <button id="switchThemeBtn">
         <img src="assets/lightbulb.png">
       </button>

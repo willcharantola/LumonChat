@@ -45,7 +45,7 @@ body
     display: grid;
     grid-template-columns: 25% 75%;
 
-    width: 90vw;
+    width: 95vw;
 
     gap: 20px;
     background-color: var(--bg);
@@ -72,7 +72,7 @@ aside
     align-items: center;
     gap: 10px;
     padding: 20px 5px;
-    border-radius: 20px;
+    border-radius: 10px;
 }
 
 .userCount
@@ -82,6 +82,11 @@ aside
     width: 90%;
     color: white;
     margin-bottom: 30px;
+}
+
+.imgUser{
+
+    border-radius: 100%;
 }
 
 .userCount span
@@ -166,11 +171,11 @@ aside
 }
 
 .statusDot.online {
-    background-color: #10c510;
+    background-color: #00C717;
 }
 
 .statusDot.offline {
-    background-color: #d41111;
+    background-color: #E4D100;
 }
 
 .deleteUserBtn {
@@ -198,14 +203,11 @@ aside
 {
     display: flex;
     width: 95%;
-
     align-items: center;
     justify-content: space-between;
     padding: 5px;
     gap: 5px;
-
-    border-radius: 10px;
-    border-top: 2px solid #6ea5ec;
+    border-top: 1px solid #90B2B4;
 }
 
 #profileBtn
@@ -217,8 +219,6 @@ aside
     flex-shrink: 0;
     width: 50px;
     aspect-ratio: 1/1;
-    border-radius: 50%;
-    border: 1px solid black;
     color: var(--c4);
     padding: 0px;
 }
@@ -243,7 +243,7 @@ aside
     align-items: center;
     flex-grow: 1;
     background-color: transparent;
-    border-radius: 10px;
+    
     border: none;
     color: white;
     gap: 5px;
@@ -258,8 +258,11 @@ aside
 #userName
 {
     grid-column: 1 / span 12;
-    font-size: 24px;
+    font-size: 12px;
+    text-transform:capitalize;
 }
+
+
 
 #statusDot
 {
@@ -323,7 +326,7 @@ header
 
     padding: 5px 15px;
 
-    border-bottom: 3px solid var(--c1);
+    border-bottom: 2px solid var(--c1);
 }
 
 header img
@@ -371,7 +374,6 @@ header button:hover
     display: flex;
     flex-direction: column;
     margin-bottom: 10px;
-
     height: 60vh;
     overflow-y: auto;
     padding: 8px;
@@ -507,7 +509,7 @@ header button:hover
     height: 50%;
     flex: 1;
     justify-content: end;
-    border-radius: 15px;
+    border-radius: 60px;
     padding: 8px 20px;
 }
 
