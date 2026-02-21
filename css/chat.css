@@ -10,9 +10,9 @@
     --c3: #a1a1a1;      /*selected message*/
     --c4: #f1f1f1;      /*message box*/
     --c5: #c6c6c6;      /*shadows*/
-    --c6: #2b2b2b;      /*dark text*/
+    --c6: #000000;      /*dark text*/
     --c7: #a1a1a1;      /*msg hour*/
-    --c8: #90B2B4;      /*write box*/  
+    --c8: #99b9ba;      /*write box*/  
     --c9: #5786a5;      /*light blue*/
     --c10: #163257;     /*darker c1*/
 
@@ -549,6 +549,7 @@ header button:hover
     justify-content: end;
     border-radius: 15px;
     padding: 8px 20px;
+    font-size: 20px;
 }
 
 .writeArea button
