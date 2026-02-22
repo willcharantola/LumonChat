@@ -77,13 +77,11 @@ carregarMensagens();
 
 
 function renderizarMensagem(dados, id) {
-
     const usuarioAtual = auth.currentUser;
     const msgBox = document.createElement("div");
     msgBox.classList.add("msgBox");
     msgBox.dataset.id = id; 
 
-    // Comparação correta usando sender_id conforme o novo padrão
     const isMine = dados.sender_id === usuarioAtual?.uid;
     msgBox.classList.add(isMine ? "sent" : "received");
 
@@ -96,7 +94,7 @@ function renderizarMensagem(dados, id) {
 
     const text = document.createElement("div");
     text.classList.add("msgBoxText");
-    text.textContent = dados.message_text; // Campo correto: message_text
+    text.textContent = dados.message_text; 
 
     const hour = document.createElement("div");
     hour.classList.add("msgBoxHour");
@@ -105,19 +103,18 @@ function renderizarMensagem(dados, id) {
     bubble.append(user, text, hour);
     msgBox.append(bubble);
 
+    // CORREÇÃO DO ARIA-LABEL: Usando dados.message_text em vez de msg
     msgBox.setAttribute("role", "article");
-    msgBox.setAttribute("aria-label",
-    `Nova mensagem de ${user.textContent}: ${msg}`
-    )
+    msgBox.setAttribute("aria-label", `Nova mensagem de ${user.textContent}: ${dados.message_text}`);
 
     chat.appendChild(msgBox);
-
     chat.scrollTop = chat.scrollHeight;
 
     const audio = document.getElementById("beep");
-    audio.play();
-    input.focus();
-    input.value="";
+    audio.play().catch(e => console.log("Autoplay bloqueado pelo browser"));
+    
+
+    
 }
 
 
