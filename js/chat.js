@@ -1,4 +1,6 @@
-
+import {fazerLogout} from './auth.js';
+import { database, auth } from './config.js';
+import { ref, push, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
 const sendButton = document.getElementById("sendButton");
 const chat = document.getElementById("mainChat");
@@ -12,49 +14,95 @@ const profileBtn = document.getElementById("profileBtn");
 
 
 sendButton.addEventListener("click", createMessage);
-function createMessage(event)
-{
+//enviado mensagem 
+async function createMessage(event) {
+
     event.preventDefault();
     const input = document.getElementById("newMsg");
-    const msg = input.value;
-    const chat = document.getElementById("mainChat");
+    const msg = input.value.trim();
+    const usuario = auth.currentUser;
 
-    if (!msg)
-        return;
+    if (!msg || !usuario) return;
 
+    try {
+        const mensagensRef = ref(database, 'messages');
+        const novaMsgRef = push(mensagensRef);
+
+        //FIZ ALGUMAS ALTERAÇÕES EM RELAÇÃO AO QUE O PROF PEDIU, MAS ESTÁ FUNCIONANDO,
+        //  LEMBRAR DE CONVERSAR COM ELE NA REUNIÃO DE SEGUNDA FEIRA
+    await set(novaMsgRef, {
+         message_id: String(novaMsgRef.key), 
+         timestamp: String(new Date().toLocaleString('pt-BR')), 
+         sender_id: String(usuario.uid),               
+         sender_name: String(usuario.displayName),     
+         sender_image: String(usuario.photoURL || ""), 
+         receiver_id: "",      
+         receiver_name: "",    
+         visibility: true,                     
+         message_text: String(msg),                
+         color: "#000000"                      
+    });
+
+        input.value = "";
+        input.focus();
+
+    } catch (error) {
+
+        console.error("Erro ao salvar no Firebase:", error);
+    }
+}
+
+//carregando mensagens enviadas para o servidor 
+
+const carregarMensagens = () => {
+
+    const mensagensRef = ref(database, 'messages');
+    
+    onValue(mensagensRef, (snapshot) => {
+       
+        chat.innerHTML = '<button id="delBtn">🗑</button>'; 
+
+        snapshot.forEach((childSnapshot) => {
+            const dados = childSnapshot.val();
+            const idMensagem = childSnapshot.key;
+            renderizarMensagem(dados, idMensagem);
+        });
+
+        chat.scrollTop = chat.scrollHeight;
+    });
+};
+
+// Iniciando a função para carregar mensagens
+carregarMensagens();
+
+
+function renderizarMensagem(dados, id) {
+
+    const usuarioAtual = auth.currentUser;
     const msgBox = document.createElement("div");
     msgBox.classList.add("msgBox");
-    
-    const isMine = Math.random() > 0.5;
+    msgBox.dataset.id = id; 
+
+    // Comparação correta usando sender_id conforme o novo padrão
+    const isMine = dados.sender_id === usuarioAtual?.uid;
     msgBox.classList.add(isMine ? "sent" : "received");
-    
-    /*
-    const photo = document.createElement("div");
-    photo.classList.add("msgBoxPhoto");
-    */
 
     const bubble = document.createElement("div");
     bubble.classList.add("msgBoxMessage");
     
-    
     const user = document.createElement("div");
     user.classList.add("msgBoxUser");
-    user.textContent = "User";
+    user.textContent = isMine ? "Você" : dados.sender_name;
 
     const text = document.createElement("div");
     text.classList.add("msgBoxText");
-    text.textContent = msg;
+    text.textContent = dados.message_text; // Campo correto: message_text
 
     const hour = document.createElement("div");
     hour.classList.add("msgBoxHour");
-    const now = new Date();
-    hour.textContent = now.getHours() + ":" +
-                    String(now.getMinutes()).padStart(2, "0");
-
-    
+    hour.textContent = dados.timestamp ? dados.timestamp.split(' ')[1].slice(0, 5) : "--:--";
 
     bubble.append(user, text, hour);
-    //msgBox.append(photo, bubble);
     msgBox.append(bubble);
 
     msgBox.setAttribute("role", "article");
@@ -71,6 +119,7 @@ function createMessage(event)
     input.focus();
     input.value="";
 }
+
 
 chat.addEventListener("click", selectMessage);
 function selectMessage(event)
@@ -271,8 +320,9 @@ dialog.addEventListener("close", () => {
 });
 
 
-confirmBtn.addEventListener("click", () => {
-  window.location.href = "login.html";
+const confirmLogout = document.getElementById("confirmLogout");
+confirmLogout.addEventListener("click", () => {
+    fazerLogout();
 });
 
 
