@@ -1,6 +1,6 @@
 
 export const exibirDadosUsuario = (user) => {
-    
+
     const nome = document.getElementById('userName');
     const email = document.getElementById('user-email');
     const foto = document.getElementById('imgUser');
@@ -9,3 +9,4 @@ export const exibirDadosUsuario = (user) => {
     if (email) email.innerText = user.email;
     if (foto) foto.src = user.photoURL;
 };
+
