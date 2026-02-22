@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 
 
   <head>
+
     <title> Lumon Chat </title>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" href="css/chat.css">
@@ -18,30 +19,32 @@
   
   
   <body>
+    <h1> Lumon Chat </h1>
     <aside>
-      <div class="userCount">
+      <h2> Barra de usuários </h2>
+      <div class="userCount" aria-live="polite" tabindex="0">
         <span>Usuários</span>
-        <span id="counter">0</span>
+        <span id="counter" aria-live="polite">0</span>
       </div>
 
-      <div class="userBoxContainer" id="userList">
+      <div class="userBoxContainer" id="userList" aria-live="polite">
       </div>
       <button class="deleteUserBtn" id="delUserBtn"> Remover </button>
       
      
       <div class="userInfo">
-        <div id="profileBtn">
-          <img id="imgUser" class="imgUser">
-        </div>
+        <button id="profileBtn" aria-label="Open profile" tabindex="0">
+          <img src="assets/user.png" alt="">
+        </button>
 
-        <div id="userDetails">
-          <div id="userName"></div>
+        <button id="userDetails" tabindex="0">
+          <div id="userName">User</div>
           <div id="statusDot" class="online"></div>
           <div id="statusDesc">Online</div>
         </div>
 
-        <button id="logoutButton">
-          <img src="assets/logout.png">
+        <button id="logoutButton" aria-label="Botão de logout" tabindex="0">
+          <img src="assets/logout.png" alt="">
         </button>
       </div>
 
@@ -49,37 +52,49 @@
 
 
     <header>
-      <img src="assets/logocompletagotabranca.svg">
-      <button id="switchThemeBtn">
-        <img src="assets/lightbulb.png">
+      <div class="logo">
+        
+      </div>
+      <button id="switchThemeBtn" aria-label="Trocar tema claro/escuro" 
+      tabindex="0">
+        <img src="assets/lightbulb.png" alt="">
       </button>
     </header>
 
-    <main class="chat" id="mainChat">
-        <button id="delBtn">🗑</button>
+    <main class="chat" id="mainChat" 
+      aria-live="polite" role="log" aria-relevant="additions" aria-atomic="false">
+      <h2> Chat </h2>
+      <button id="delBtn" tabindex="0">🗑</button>
     </main>
 
     
     <form class="writeArea">
-    	<input type="text" id="newMsg">
-        <button type="submit" id="sendButton">
-            <svg viewBox="0 0 24 24" class="icon">
-              <path
-                d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
-              </svg>
+
+      <h2> Caixa de texto </h2>
+
+      <label for="newMsg" class="hidden">Message</label>
+      <input type="text" id="newMsg" aria-label="Digite sua mensagem">
+      
+        <button type="submit" id="sendButton" aria-label="Enviar mensagem">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+              <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
+            </svg>
         </button>
+
     </form>
 
 
     <button id="addUserButton"> Add User </button>
 
-    <div class="alertOverlay" id="alertBox">
+    <dialog id="alertBox" aria-labelledby="logoutTitle">
       <div class="exitContent">
-        <p>Tem certeza que deseja sair?</p>
-        <button id="cancelLogout"> Cancelar </button>
-        <button id="confirmLogout"> Sair </button>
+        <p id="logoutTitle">Tem certeza que deseja sair?</p>
+        <button id="cancelLogout">Cancelar</button>
+        <button id="confirmLogout">Sair</button>
       </div>
-    </div>
+    </dialog>
+
+    <audio id="beep" src="assets/msgbeep.mp3"></audio>
 
   </body>
   

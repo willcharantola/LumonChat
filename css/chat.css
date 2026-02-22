@@ -10,9 +10,9 @@
     --c3: #a1a1a1;      /*selected message*/
     --c4: #f1f1f1;      /*message box*/
     --c5: #c6c6c6;      /*shadows*/
-    --c6: #2b2b2b;      /*dark text*/
+    --c6: #000000;      /*dark text*/
     --c7: #a1a1a1;      /*msg hour*/
-    --c8: #90B2B4;      /*write box*/  
+    --c8: #99b9ba;      /*write box*/  
     --c9: #5786a5;      /*light blue*/
     --c10: #163257;     /*darker c1*/
 
@@ -63,6 +63,30 @@ body
 {
     filter: blur(5px);
 }
+
+h1, h2
+{
+    display: none;
+}
+
+.hidden
+{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+*:focus-visible
+{
+    border: 3px solid yellow;
+}
+    
 
 /************************* side bar *************************/
 
@@ -532,6 +556,7 @@ header button:hover
     justify-content: end;
     border-radius: 60px;
     padding: 8px 20px;
+    font-size: 20px;
 }
 
 .writeArea button
@@ -570,13 +595,9 @@ header button:hover
 /****************** pop-ups ****************************/
 
 
-.alertOverlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.5);
-    display: none;
-    justify-content: center;
-    align-items: center;
+#alertBox {
+    border: none;
+    border-radius: 20px;
 }
 
 .exitContent {
