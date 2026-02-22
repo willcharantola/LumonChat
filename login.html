@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lumon Chat - Login</title>
     <link rel="stylesheet" href="./css/stylelogin.css">
+
+     <script type="module" src="./js/config.js"></script>
+      <script type="module" src="./js/auth.js"></script>
 </head>
 <body>
 
@@ -13,12 +16,8 @@
 
             <section class="login-brand">
                 <div class="brand-content">
-                    <img src="./assets/logolumon.svg" alt="Logo Lumon" class="brand-logo">
+                    <img src="./assets/logo-completa-azulescuro.svg" alt="Logo Lumon" class="brand-logo">
                     
-                    <div class="brand-text">
-                        <h1>Lumon</h1>
-                        <h1>Chat</h1>
-                    </div>
                 </div>
             </section>
 
@@ -28,7 +27,7 @@
                 </div>
 
                 <div class="login-google">
-                    <button class="google-btn">
+                    <button id="google-btn" class="google-btn">
                         Logar com Google
                         <img src="./assets/google.svg" alt="Google Icon" class="google-icon">
                     </button>
@@ -37,6 +36,20 @@
 
         </div>
     </main>
+
+   <script type="module">
+    
+    import { loginComGoogle } from "./js/auth.js";
+
+    const botao_login = document.getElementById("google-btn");
+    
+    botao_login.addEventListener("click", () => {
+        
+        loginComGoogle();
+    });
+</script>
+
+   
 
 </body>
 
