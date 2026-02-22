@@ -16,6 +16,7 @@ const profileBtn = document.getElementById("profileBtn");
 sendButton.addEventListener("click", createMessage);
 //enviado mensagem 
 async function createMessage(event) {
+
     event.preventDefault();
     const input = document.getElementById("newMsg");
     const msg = input.value.trim();
@@ -29,34 +30,36 @@ async function createMessage(event) {
 
         //FIZ ALGUMAS ALTERAÇÕES EM RELAÇÃO AO QUE O PROF PEDIU, MAS ESTÁ FUNCIONANDO,
         //  LEMBRAR DE CONVERSAR COM ELE NA REUNIÃO DE SEGUNDA FEIRA
-       await set(novaMsgRef, {
-    message_id: String(novaMsgRef.key), 
-    timestamp: String(new Date().toLocaleString('pt-BR')), 
-    sender_id: String(usuario.uid),               
-    sender_name: String(usuario.displayName),     
-    sender_image: String(usuario.photoURL || ""), 
-    receiver_id: "",      
-    receiver_name: "",    
-    visibility: true,                     
-    message_text: String(msg),                
-    color: "#000000"                      
-});
-
-     
+    await set(novaMsgRef, {
+         message_id: String(novaMsgRef.key), 
+         timestamp: String(new Date().toLocaleString('pt-BR')), 
+         sender_id: String(usuario.uid),               
+         sender_name: String(usuario.displayName),     
+         sender_image: String(usuario.photoURL || ""), 
+         receiver_id: "",      
+         receiver_name: "",    
+         visibility: true,                     
+         message_text: String(msg),                
+         color: "#000000"                      
+    });
 
         input.value = "";
         input.focus();
+
     } catch (error) {
+
         console.error("Erro ao salvar no Firebase:", error);
     }
 }
 
 //carregando mensagens enviadas para o servidor 
+
 const carregarMensagens = () => {
+
     const mensagensRef = ref(database, 'messages');
     
     onValue(mensagensRef, (snapshot) => {
-        // Mantém apenas o botão de deletar no chat ao recarregar
+       
         chat.innerHTML = '<button id="delBtn">🗑</button>'; 
 
         snapshot.forEach((childSnapshot) => {
@@ -74,8 +77,8 @@ carregarMensagens();
 
 
 function renderizarMensagem(dados, id) {
-    const usuarioAtual = auth.currentUser;
 
+    const usuarioAtual = auth.currentUser;
     const msgBox = document.createElement("div");
     msgBox.classList.add("msgBox");
     msgBox.dataset.id = id; 
