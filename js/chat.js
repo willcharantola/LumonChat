@@ -6,7 +6,7 @@ const sendButton = document.getElementById("sendButton");
 const chat = document.getElementById("mainChat");
 const deleteBtn = document.getElementById("delBtn");
 const switchBtn = document.getElementById("switchThemeBtn");
-const addUserBtn = document.getElementById("addUserButton");
+
 const delUserBtn = document.getElementById("delUserBtn");
 const switchStatusBtn = document.getElementById("userDetails");
 const logoutBtn = document.getElementById("logoutButton");
@@ -170,46 +170,8 @@ switchBtn.addEventListener("click", () =>
 })
 
 
-addUserBtn.addEventListener("click", addUser);
-function addUser(event)
-{
-    const container = document.getElementById("userList");
 
-    const newBox = document.createElement("div");
-    //newBox.classList.add("userBox", "new");
-    newBox.classList.add("userBox");
 
-    const photo = document.createElement("div");
-    photo.classList.add("userBoxPhoto");
-    const img = document.createElement("img");
-    img.src = "../assets/user.png";
-    img.alt = "";
-    photo.appendChild(img);
-
-    const name = document.createElement("div");
-    name.classList.add("userBoxName");
-    name.textContent = "User";
-
-    const status = document.createElement("div");
-    status.classList.add("userBoxStatus");
-    const dot = document.createElement("div");
-    dot.classList.add("statusDot", "online");
-    status.appendChild(dot);
-
-    newBox.append(photo, name, status);
-    newBox.tabIndex="0";
-    container.appendChild(newBox);
-
-    /*
-    requestAnimationFrame(() => {
-        newBox.classList.remove("new");
-    });
-    */
-
-    const counter = document.getElementById("counter");
-    counter.textContent = container.children.length;
-
-}
 
 
 
