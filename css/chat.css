@@ -571,11 +571,11 @@ header button:hover
     border: none;
     width: 4vw;
     min-width: 50px;
-    max-width: 60px;
+    max-width: 50px;
     aspect-ratio: 1/1;
     border-radius: 50%;
     color: var(--c4);
-    padding: 8px;
+    padding: 1px;
 }
 
 .writeArea button svg
@@ -630,6 +630,32 @@ header button:hover
 .profileContent
 {
     background: blue;
+}
+
+
+/****************** botões/ícones público-privado ****************************/
+
+/* --- Ícones de Canto nas Mensagens --- */
+.msg { position: relative; }
+.bubble-corner-icon { position: absolute; width: 18px; height: 18px; top: 8px; z-index: 2; }
+.myMsg .bubble-corner-icon { left: 8px; }
+.otherMsg .bubble-corner-icon { right: 8px; }
+.myMsg .msg-content-wrapper { padding-left: 20px; }
+.otherMsg .msg-content-wrapper { padding-right: 20px; }
+
+/* Cor da mensagem PRIVADA */
+.msg.private { background-color: #ffeaa7; border: 1px solid #fdcb6e; color: black; }
+.dark .msg.private { background-color: #534b35; border: 1px solid #756a4b; color: white; }
+.msg-directed-info { font-size: 11px; font-style: italic; opacity: 0.8; }
+.hidden { display: none !important; }
+
+.round-btn:hover {
+    transform: scale(1.05);
+}
+
+.round-btn img {
+    width: 100%;
+    height: 100%;
 }
 
 

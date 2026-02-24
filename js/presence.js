@@ -1,5 +1,7 @@
 import { database } from './config.js';
 import { ref, set, onValue, onDisconnect, serverTimestamp, update } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { selecionarDestinatario } from './messages.js';
+import { auth } from './config.js'; 
 
 const userListContainer = document.querySelector(".userBoxContainer");
 const userCounter = document.querySelector(".userCount");
@@ -83,32 +85,53 @@ const renderizarUsuarioNaLista = (uid, dados) => {
     const newBox = document.createElement("div");
     newBox.classList.add("userBox");
     newBox.tabIndex = "0";
-    
-    // guardar UID
     newBox.dataset.uid = uid; 
     newBox.dataset.name = dados.name;
 
-    // foto
+    // Foto, Nome e Status
     const photo = document.createElement("div");
     photo.classList.add("userBoxPhoto");
     const img = document.createElement("img");
     img.src = dados.image;
-    img.alt = `Foto de ${dados.name}`;
     photo.appendChild(img);
 
-    // nome
     const name = document.createElement("div");
     name.classList.add("userBoxName");
     name.textContent = dados.name.split(' ')[0]; 
 
-    // status
     const status = document.createElement("div");
     status.classList.add("userBoxStatus");
     const dot = document.createElement("div");
     dot.classList.add("statusDot", dados.status);
     status.appendChild(dot);
 
-    newBox.append(photo, name, status);
+    // APENAS o botão de Direcionar (sem botão de remover)
+    const btnPrivado = document.createElement("button");
+    btnPrivado.textContent = "Direcionar mensagem"; 
+    btnPrivado.classList.add("btn-privado", "hidden");
+    
+    // Mostra o botão ao clicar na caixinha do usuário
+    newBox.addEventListener("click", () => {
+        document.querySelectorAll(".btn-privado").forEach(btn => btn.classList.add("hidden"));
+        btnPrivado.classList.remove("hidden");
+    });
+
+    // Quando clica em "Direcionar mensagem"
+    btnPrivado.addEventListener("click", (e) => {
+        e.stopPropagation(); // Impede que o clique feche o botão
+        
+        // Verifica se o usuário não está tentando mandar mensagem para ele mesmo
+        
+        if (auth.currentUser && uid === auth.currentUser.uid) {
+            alert("Você não pode direcionar uma mensagem para si mesmo!");
+            return;
+        }
+
+        selecionarDestinatario(uid, dados.name); // Marca o usuário lá no HTML!
+    }); 
+
+    // Adiciona os elementos na caixa (note que não há botão de delUserBtn aqui)
+    newBox.append(photo, name, status, btnPrivado); 
     userListContainer.appendChild(newBox);
 };
 

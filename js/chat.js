@@ -1,6 +1,7 @@
 import {fazerLogout} from './auth.js';
 import { database, auth } from './config.js';
 import { ref, push, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { enviarMensagem } from './messages.js';
 
 const sendButton = document.getElementById("sendButton");
 const chat = document.getElementById("mainChat");
@@ -13,44 +14,12 @@ const logoutBtn = document.getElementById("logoutButton");
 const profileBtn = document.getElementById("profileBtn");
 
 
-sendButton.addEventListener("click", createMessage);
-//enviado mensagem 
-async function createMessage(event) {
-
-    event.preventDefault();
+sendButton.addEventListener("click", (e) => {
+    e.preventDefault();
     const input = document.getElementById("newMsg");
-    const msg = input.value.trim();
-    const usuario = auth.currentUser;
+    enviarMensagem(input.value);
+});
 
-    if (!msg || !usuario) return;
-
-    try {
-        const mensagensRef = ref(database, 'messages');
-        const novaMsgRef = push(mensagensRef);
-
-        //FIZ ALGUMAS ALTERAÇÕES EM RELAÇÃO AO QUE O PROF PEDIU, MAS ESTÁ FUNCIONANDO,
-        //  LEMBRAR DE CONVERSAR COM ELE NA REUNIÃO DE SEGUNDA FEIRA
-    await set(novaMsgRef, {
-         message_id: String(novaMsgRef.key), 
-         timestamp: String(new Date().toLocaleString('pt-BR')), 
-         sender_id: String(usuario.uid),               
-         sender_name: String(usuario.displayName),     
-         sender_image: String(usuario.photoURL || ""), 
-         receiver_id: "",      
-         receiver_name: "",    
-         visibility: true,                     
-         message_text: String(msg),                
-         color: "#000000"                      
-    });
-
-        input.value = "";
-        input.focus();
-
-    } catch (error) {
-
-        console.error("Erro ao salvar no Firebase:", error);
-    }
-}
 
 //carregando mensagens enviadas para o servidor 
 
@@ -60,19 +29,38 @@ const carregarMensagens = () => {
     
     onValue(mensagensRef, (snapshot) => {
        
-        chat.innerHTML = '<button id="delBtn">🗑</button>'; 
+        chat.innerHTML = '<button id="delBtn" tabindex="0">🗑</button>'; 
+
+        const usuarioAtual = auth.currentUser;
+        if (!usuarioAtual) return;
+        const meuUid = usuarioAtual.uid;
 
         snapshot.forEach((childSnapshot) => {
             const dados = childSnapshot.val();
             const idMensagem = childSnapshot.key;
-            renderizarMensagem(dados, idMensagem);
-        });
 
+            // FILTRO DE PRIVACIDADE:
+            // Mostra se for pública (visibility === true)
+            // OU se for privada destinada a mim (receiver_id === meuUid)
+            // OU se fui eu quem enviei (sender_id === meuUid)
+            if (dados.visibility === true || dados.receiver_id === meuUid || dados.sender_id === meuUid) {
+                renderizarMensagem(dados, idMensagem);
+            }
+        });
+        
         chat.scrollTop = chat.scrollHeight;
     });
 };
 
-// Iniciando a função para carregar mensagens
+
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        carregarMensagens();
+    }
+});
+
+
 carregarMensagens();
 
 
@@ -83,14 +71,43 @@ function renderizarMensagem(dados, id) {
     msgBox.dataset.id = id; 
 
     const isMine = dados.sender_id === usuarioAtual?.uid;
+    
+    
     msgBox.classList.add(isMine ? "sent" : "received");
+    msgBox.classList.add(isMine ? "myMsg" : "otherMsg"); 
+
+    //ÍCONE E COR PRIVADA ---
+    let bubbleIcon = "assets/publicmsg.svg";
+    if (dados.visibility === false) {
+        bubbleIcon = "assets/privatemsg.svg";
+        msgBox.classList.add("private"); 
+    }
 
     const bubble = document.createElement("div");
     bubble.classList.add("msgBoxMessage");
+    // Adiciona position relative para que o ícone fique preso no canto da bolha
+    bubble.style.position = "relative"; 
+    
+    //CRIAÇÃO DO ÍCONE SVG ---
+    const icone = document.createElement("img");
+    icone.src = bubbleIcon;
+    icone.classList.add("bubble-corner-icon");
     
     const user = document.createElement("div");
     user.classList.add("msgBoxUser");
-    user.textContent = isMine ? "Você" : dados.sender_name;
+    
+    //INDICADOR DE "PARA:"
+    let textoDirecionamento = "";
+    if (dados.receiver_id) {
+        if (isMine) {
+            textoDirecionamento = ` (para ${dados.receiver_name})`;
+        } else if (dados.receiver_id === usuarioAtual?.uid) {
+            textoDirecionamento = ` (para você)`;
+        } else {
+            textoDirecionamento = ` (para ${dados.receiver_name})`;
+        }
+    }
+    user.textContent = (isMine ? "Você" : dados.sender_name) + textoDirecionamento;
 
     const text = document.createElement("div");
     text.classList.add("msgBoxText");
@@ -100,10 +117,10 @@ function renderizarMensagem(dados, id) {
     hour.classList.add("msgBoxHour");
     hour.textContent = dados.timestamp ? dados.timestamp.split(' ')[1].slice(0, 5) : "--:--";
 
-    bubble.append(user, text, hour);
+    //ÍCONE NA BOLHA ---
+    bubble.append(icone, user, text, hour);
     msgBox.append(bubble);
 
-    // CORREÇÃO DO ARIA-LABEL: Usando dados.message_text em vez de msg
     msgBox.setAttribute("role", "article");
     msgBox.setAttribute("aria-label", `Nova mensagem de ${user.textContent}: ${dados.message_text}`);
 
@@ -111,10 +128,7 @@ function renderizarMensagem(dados, id) {
     chat.scrollTop = chat.scrollHeight;
 
     const audio = document.getElementById("beep");
-    audio.play().catch(e => console.log("Autoplay bloqueado pelo browser"));
-    
-
-    
+    if(audio) audio.play().catch(e => console.log("Autoplay bloqueado pelo browser"));
 }
 
 

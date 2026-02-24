@@ -10,7 +10,6 @@ import { iniciarSistemaPresenca, marcarComoOffline } from './presence.js';
 // Função para iniciar o login
 export const loginComGoogle = async () => {
     try {
-        // Implementar tela de carregamento aqui
         console.log("Iniciando login...");
         
         const result = await signInWithPopup(auth, googleProvider);
@@ -19,7 +18,6 @@ export const loginComGoogle = async () => {
         console.log("Usuário logado:", user.displayName);
        
     } catch (error) {
-       
         console.error("Erro na autenticação:", error.code, error.message);
         alert("Falha ao entrar: " + error.message);
     }
@@ -50,11 +48,11 @@ onAuthStateChanged(auth, (user) => {
     if (user) {
         // usuário está autenticado
         console.log("Sessão ativa para:", user.email);
-
         
         // se estiver na tela de login, manda para o chat
         if (paginaAtual.includes('login.html')) {
             window.location.href = 'chat.html';
+            return;
         }
 
         exibirDadosUsuario(user);
@@ -62,12 +60,12 @@ onAuthStateChanged(auth, (user) => {
         const telaDeChat = document.querySelector(".userBoxContainer");
         if (telaDeChat) {
             iniciarSistemaPresenca(user);
+            // Removido o escutarMensagens() daqui, pois agora o chat.js fará isso.
         }
 
     } else {
         // usuário não está autenticado
-        // se tentar acessar o chat sem login, redireciona para login.html
-        if (paginaAtual.includes('index.html') || paginaAtual.includes('chat.html') || paginaAtual === '/') {
+        if (paginaAtual.includes('chat.html')) {
             window.location.href = 'login.html';
         }
     }

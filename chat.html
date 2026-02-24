@@ -30,7 +30,7 @@
 
       <div class="userBoxContainer" id="userList" aria-live="polite">
       </div>
-      <button class="deleteUserBtn" id="delUserBtn"> Remover </button>
+     
       
      
       <div class="userInfo">
@@ -69,18 +69,27 @@
     </main>
 
     
+    <div id="directedIndicator" class="hidden" style="text-align: center; font-size: 14px; color: var(--c1); font-weight: bold; background: var(--bg); padding: 5px; margin-bottom: -10px;">
+        Enviando para: <span id="directedUserName"></span>
+        <button type="button" id="cancelDirectedBtn" style="background: none; border: none; color: red; cursor: pointer; font-weight: bold; padding: 0 5px; min-width: auto; width: auto; height: auto;">[X]</button>
+    </div>
+
     <form class="writeArea">
 
       <h2> Caixa de texto </h2>
 
+      <button type="button" id="togglePrivateBtn" aria-label="Alternar modo Privado/Público" title="Alternar modo Privado/Público">
+          <img src="assets/openlock.svg" id="btnLockIcon" style="width: 50px; height: 50px; object-fit: contain;" alt="Cadeado">
+      </button>
+
       <label for="newMsg" class="hidden">Message</label>
       <input type="text" id="newMsg" aria-label="Digite sua mensagem">
       
-        <button type="submit" id="sendButton" aria-label="Enviar mensagem">
-            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
-              <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
-            </svg>
-        </button>
+      <button type="submit" id="sendButton" aria-label="Enviar mensagem">
+          <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+            <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
+          </svg>
+      </button>
 
     </form>
 
