@@ -26,20 +26,20 @@
 
       <div class="userBoxContainer" id="userList" aria-live="polite">
       </div>
-      <button class="deleteUserBtn" id="delUserBtn"> Remover </button>
+      <button class="deleteUserBtn" id="delUserBtn" tabindex="-1"> Remover </button>
       
       <div class="userInfo">
-        <button id="profileBtn" aria-label="Open profile" tabindex="0">
+        <button id="profileBtn" aria-label="Open profile">
           <img src="assets/user.png" alt="">
         </button>
 
-        <button id="userDetails" tabindex="0">
+        <button id="userDetails">
           <div id="userName">User</div>
           <div id="statusDot" class="online"></div>
           <div id="statusDesc">Online</div>
         </button>
 
-        <button id="logoutButton" aria-label="Botão de logout" tabindex="0">
+        <button id="logoutButton" aria-label="Botão de logout">
           <img src="assets/logout.png" alt="">
         </button>
       </div>
@@ -57,10 +57,10 @@
       </button>
     </header>
 
-    <main class="chat" id="mainChat" 
+    <main class="chat" id="mainChat"
       aria-live="polite" role="log" aria-relevant="additions" aria-atomic="false">
       <h2> Chat </h2>
-      <button id="delBtn" tabindex="0">🗑</button>
+      <button id="delBtn" tabindex="-1">🗑</button>
     </main>
 
     
@@ -68,15 +68,14 @@
 
       <h2> Caixa de texto </h2>
 
-      <label for="newMsg" class="hidden">Message</label>
-      <input type="text" id="newMsg" aria-label="Digite sua mensagem">
-      
+      <label for="newMsg" class="hidden">Digite sua mensagem</label>
+      <textarea id="newMsg"></textarea>   
         <button type="submit" id="sendButton" aria-label="Enviar mensagem">
-            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" class="icon" aria-hidden="true"
+            aria-label="Submit">
               <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z"/>
             </svg>
         </button>
-
     </form>
 
 

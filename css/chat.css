@@ -461,7 +461,7 @@ header button:hover
     color: var(--c6);
 }
 
-#delBtn:hover
+#delBtn:hover, #delBtn:focus-visible
 {
     background-color: color-mix(in srgb, var(--c3) 85%, black); 
 }
@@ -544,6 +544,20 @@ header button:hover
 }   
 
 .writeArea input
+{
+    background-color: var(--c8);
+    color: var(--c6);
+    border: none;
+    align-self: center;
+    height: 50%;
+    flex: 1;
+    justify-content: end;
+    border-radius: 15px;
+    padding: 8px 20px;
+    font-size: 20px;
+}
+
+.writeArea textarea
 {
     background-color: var(--c8);
     color: var(--c6);
