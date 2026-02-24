@@ -147,6 +147,7 @@ function deleteMessage(event){
 
     deleteBtn.style.display = "none";
     deleteBtn.setAttribute("tabindex", "-1");
+    chat.append(deleteBtn);
 }
 
 
@@ -343,4 +344,8 @@ fetch("assets/logo.svg")
 
 
 
-
+const toggleBtn = document.getElementById("toggleAside");
+const aside = document.querySelector("aside");
+toggleBtn.addEventListener("click", () => {
+    aside.classList.toggle("active");
+})
