@@ -1,17 +1,19 @@
 import {fazerLogout} from './auth.js';
 import { database, auth } from './config.js';
-import { ref, push, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { ref, onValue, query, orderByChild, limitToLast, onChildAdded } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 import { enviarMensagem } from './messages.js';
 
 const sendButton = document.getElementById("sendButton");
 const chat = document.getElementById("mainChat");
 const deleteBtn = document.getElementById("delBtn");
-const switchBtn = document.getElementById("switchThemeBtn");
+
 
 const delUserBtn = document.getElementById("delUserBtn");
 const switchStatusBtn = document.getElementById("userDetails");
 const logoutBtn = document.getElementById("logoutButton");
 const profileBtn = document.getElementById("profileBtn");
+
+const mensagensRenderizadas = new Set();
 
 
 sendButton.addEventListener("click", (e) => {
@@ -23,32 +25,52 @@ sendButton.addEventListener("click", (e) => {
 
 //carregando mensagens enviadas para o servidor 
 
+
+
 const carregarMensagens = () => {
-
     const mensagensRef = ref(database, 'messages');
-    
-    onValue(mensagensRef, (snapshot) => {
-       
-        chat.innerHTML = '<button id="delBtn" tabindex="0">🗑</button>'; 
 
+    // REQUISITO: Implementar paginação (50 mensagens iniciais) e ordenação eficiente
+    const consultaPaginada = query(
+        mensagensRef,
+        orderByChild('timestamp'),
+        limitToLast(50) 
+    );
+
+    // REQUISITO: Manter performance com 500+ mensagens usando onChildAdded
+    onChildAdded(consultaPaginada, (snapshot) => {
+        const idMensagem = snapshot.key;
+
+        // Evita duplicatas se a função for chamada novamente
+        if (mensagensRenderizadas.has(idMensagem)) return;
+
+        const dados = snapshot.val();
         const usuarioAtual = auth.currentUser;
         if (!usuarioAtual) return;
         const meuUid = usuarioAtual.uid;
 
-        snapshot.forEach((childSnapshot) => {
-            const dados = childSnapshot.val();
-            const idMensagem = childSnapshot.key;
+        // REQUISITO: Filtrar mensagens privadas corretamente (sender ou receiver)
+        const podeVer = 
+            dados.visibility === true || 
+            dados.receiver_id === meuUid || 
+            dados.sender_id === meuUid;
 
-            // FILTRO DE PRIVACIDADE:
-            // Mostra se for pública (visibility === true)
-            // OU se for privada destinada a mim (receiver_id === meuUid)
-            // OU se fui eu quem enviei (sender_id === meuUid)
-            if (dados.visibility === true || dados.receiver_id === meuUid || dados.sender_id === meuUid) {
-                renderizarMensagem(dados, idMensagem);
-            }
-        });
-        
-        chat.scrollTop = chat.scrollHeight;
+        if (podeVer) {
+            renderizarMensagem(dados, idMensagem);
+            mensagensRenderizadas.add(idMensagem);
+            
+            // Garante que o scroll desça apenas para novas mensagens
+            chat.scrollTop = chat.scrollHeight;
+        }
+    });
+};
+
+// Lógica para filtrar mensagens visualmente sem nova consulta ao banco
+const filtrarBuscaTexto = (termo) => {
+    const termoBaixo = termo.toLowerCase();
+    document.querySelectorAll('.msgBox').forEach(msg => {
+        const conteudo = msg.querySelector('.msgBoxText').textContent.toLowerCase();
+        msg.style.display = conteudo.includes(termoBaixo) ? "flex" : "none";
     });
 };
 
@@ -135,7 +157,8 @@ function renderizarMensagem(dados, id) {
     
     bubble.append(user, text, hour);
     msgBox.append(bubble);
-
+    
+    msgBox.setAttribute('data-visibility', dados.visibility ? 'publica' : 'privada');
     msgBox.setAttribute("role", "article");
     msgBox.setAttribute("aria-label", `Nova mensagem de ${user.textContent}: ${dados.message_text}`);
 
@@ -182,7 +205,7 @@ function selectMessage(event)
         }
     }
 }
-
+/*
 deleteBtn.addEventListener("click", () => 
 {
     document.querySelectorAll(".msgBox.selected")
@@ -193,7 +216,7 @@ deleteBtn.addEventListener("click", () =>
 
 
 
-switchBtn.addEventListener("click", () => {
+switchBtn.addEventListener("change", () => {
    
     document.body.classList.toggle("dark");
 
@@ -212,12 +235,11 @@ window.addEventListener("DOMContentLoaded", () => {
     if (temaSalvo === "dark") {
         document.body.classList.add("dark");
         
-        // Se o seu switchBtn for um checkbox, adicione esta linha:
-        // switchBtn.checked = true; 
+       if (switchBtn) switchBtn.checked = true;
     }
 });
 
-
+*/
 
 
 
@@ -252,7 +274,7 @@ function selectUser(event)
     }
 }
 
-
+/*
 delUserBtn.addEventListener("click", () => 
 {
     const container = document.getElementById("userList");
@@ -264,7 +286,7 @@ delUserBtn.addEventListener("click", () =>
 
     const counter = document.getElementById("counter");
     counter.textContent = container.children.length;
-})
+})*/
 
 
 switchStatusBtn.addEventListener("click", toggleStatus);
@@ -365,5 +387,57 @@ document.querySelectorAll('input[name="category"]').forEach(input => {
 
         // 4. Fecha o menu
         document.getElementById('options-view-button').checked = false;
+    });
+});
+
+
+function inicializarTema() {
+    const switchBtn = document.getElementById("switchThemeBtn");
+    const temaSalvo = localStorage.getItem("tema");
+
+    if (temaSalvo === "dark") {
+        document.body.classList.add("dark");
+        if (switchBtn) switchBtn.checked = true;
+    }
+
+    if (switchBtn) {
+        switchBtn.addEventListener("change", () => {
+            document.body.classList.toggle("dark");
+            if (document.body.classList.contains("dark")) {
+                localStorage.setItem("tema", "dark");
+            } else {
+                localStorage.setItem("tema", "light");
+            }
+        });
+    }
+}
+
+inicializarTema();
+
+// Seleciona todos os rádios do filtro de mensagens
+const radiosFiltro = document.querySelectorAll('input[name="category"]');
+
+radiosFiltro.forEach(radio => {
+    radio.addEventListener('change', function() {
+        const filtroSelecionado = this.value;
+        const mensagens = document.querySelectorAll(".msgBox");
+
+        mensagens.forEach(msg => {
+            // Requisito: Filtrar com base no atributo data-visibility definido na renderização
+            const visibilidadeMsg = msg.getAttribute('data-visibility');
+
+            if (filtroSelecionado === "todas") {
+                msg.style.display = "flex";
+            } else {
+                // Desafio técnico: Combinar filtros visualmente
+                msg.style.display = (visibilidadeMsg === filtroSelecionado) ? "flex" : "none";
+            }
+        });
+
+        // Fecha o menu após a seleção
+        document.getElementById('options-view-button').checked = false;
+        
+        // Mantém o scroll no final
+        chat.scrollTop = chat.scrollHeight;
     });
 });
