@@ -171,6 +171,11 @@ function renderizarMensagem(dados, id) {
 
 
 chat.addEventListener("click", selectMessage);
+chat.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    selectMessage(event);
+});
+
 function selectMessage(event)
 {
 
@@ -181,6 +186,8 @@ function selectMessage(event)
         document.querySelectorAll(".msgBox.selected")
         .forEach(el => el.classList.remove("selected"));
         deleteBtn.style.display = "none";
+        deleteBtn.setAttribute("tabindex", "-1");
+        chat.appendChild(deleteBtn);
         return;
     }
 
@@ -188,6 +195,8 @@ function selectMessage(event)
     {
         box.classList.remove("selected");
         deleteBtn.style.display = "none";
+        deleteBtn.setAttribute("tabindex", "-1");
+        chat.appendChild(deleteBtn);
     } else {
         document.querySelectorAll(".msgBox.selected")
         .forEach(el => el.classList.remove("selected"));
@@ -195,14 +204,28 @@ function selectMessage(event)
 
         const rect = box.getBoundingClientRect();
         deleteBtn.style.display = "block";
+        deleteBtn.setAttribute("tabindex", "0");
         deleteBtn.style.transform = "translateY(-50%)";
         deleteBtn.style.top = rect.top + window.scrollY + rect.height / 2 + "px";
+        box.appendChild(deleteBtn);
 
         if (box.classList.contains("sent")) {
             deleteBtn.style.left = rect.left + window.scrollX - 40 + "px";
         } else {
             deleteBtn.style.left = rect.right + window.scrollX + 10 + "px";
         }
+  
+        document.addEventListener("focusin", (event) => {
+            const selected = document.querySelector(".msgBox.selected");
+            if (!selected) return;
+
+            if (!selected.contains(event.target) && !deleteBtn.contains(event.target)){
+                selected.classList.remove("selected");
+                deleteBtn.style.display = "none";
+                deleteBtn.setAttribute("tabindex", "-1");
+                chat.appendChild(deleteBtn);
+            }
+        })
     }
 }
 /*
@@ -212,7 +235,9 @@ deleteBtn.addEventListener("click", () =>
     .forEach(el => el.remove());
 
     deleteBtn.style.display = "none";
-})
+    deleteBtn.setAttribute("tabindex", "-1");
+    chat.append(deleteBtn);
+}
 
 
 
@@ -243,40 +268,66 @@ window.addEventListener("DOMContentLoaded", () => {
 
 
 
-const userListCont = document.getElementById("userList");
-userListCont.addEventListener("click", selectUser);
-function selectUser(event)
-{
+
+
+const userListContainer = document.getElementById("userList");
+userListContainer.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    selectUser(event);
+});
+userListContainer.addEventListener("click", selectUser);
+function selectUser(event) {
     const user = event.target.closest(".userBox");
 
     if (!user) {
-        document.querySelectorAll(".userBox.selected")
-            .forEach(el => el.classList.remove("selected"));
-        delUserBtn.classList.remove("selected");
+        clearSelection();
         return;
     }
 
     const selected = user.classList.contains("selected");
-
-    document.querySelectorAll(".userBox.selected")
-        .forEach(el => el.classList.remove("selected"));
-
-    user.classList.toggle("selected", !selected);
+    clearSelection();
 
     if (!selected) {
-        delUserBtn.classList.add("selected");
+        user.classList.add("selected");
+
         const rect = user.getBoundingClientRect();
+        delUserBtn.setAttribute("tabindex", "0");
+        delUserBtn.classList.add("selected");
+        delUserBtn.hidden = false;
         delUserBtn.style.position = "absolute";
         delUserBtn.style.top = rect.top + window.scrollY + rect.height / 5 + "px";
         delUserBtn.style.left = rect.right + 15 + "px";
-    } else {
-        delUserBtn.classList.remove("selected");
+        user.appendChild(delUserBtn);
     }
 }
 
-/*
-delUserBtn.addEventListener("click", () => 
-{
+function clearSelection() {
+    document.querySelectorAll(".userBox.selected")
+        .forEach(el => el.classList.remove("selected"));
+
+    delUserBtn.classList.remove("selected");
+    delUserBtn.hidden = true;
+    delUserBtn.setAttribute("tabindex", "-1");
+    document.body.appendChild(delUserBtn);
+}
+
+document.addEventListener("focusin", (event) => {
+    const selected = document.querySelector(".userBox.selected");
+    if (!selected) return;
+
+    if (!selected.contains(event.target) &&
+        !delUserBtn.contains(event.target)) {
+        clearSelection();
+    }
+});
+
+
+delUserBtn.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    deleteUser(event);
+});
+delUserBtn.addEventListener("click", deleteUser);
+function deleteUser(event){
     const container = document.getElementById("userList");
 
     document.querySelectorAll(".userBox.selected")
@@ -286,7 +337,7 @@ delUserBtn.addEventListener("click", () =>
 
     const counter = document.getElementById("counter");
     counter.textContent = container.children.length;
-})*/
+}
 
 
 switchStatusBtn.addEventListener("click", toggleStatus);
