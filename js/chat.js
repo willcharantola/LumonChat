@@ -1,78 +1,173 @@
-
+import {fazerLogout} from './auth.js';
+import { database, auth } from './config.js';
+import { ref, onValue, query, orderByChild, limitToLast, onChildAdded, endBefore, get } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { enviarMensagem } from './messages.js';
 
 const sendButton = document.getElementById("sendButton");
 const chat = document.getElementById("mainChat");
 const deleteBtn = document.getElementById("delBtn");
-const switchBtn = document.getElementById("switchThemeBtn");
-const addUserBtn = document.getElementById("addUserButton");
+
+
 const delUserBtn = document.getElementById("delUserBtn");
 const switchStatusBtn = document.getElementById("userDetails");
 const logoutBtn = document.getElementById("logoutButton");
 const profileBtn = document.getElementById("profileBtn");
 
+const mensagensRenderizadas = new Set();
 
-sendButton.addEventListener("click", createMessage);
-function createMessage(event)
-{
-    event.preventDefault();
+
+sendButton.addEventListener("click", (e) => {
+    e.preventDefault();
     const input = document.getElementById("newMsg");
-    const msg = input.value;
-    const chat = document.getElementById("mainChat");
+    enviarMensagem(input.value);
+});
 
-    if (!msg)
-        return;
 
+//carregando mensagens enviadas para o servidor 
+
+
+
+const carregarMensagens = () => {
+    const mensagensRef = ref(database, 'messages');
+
+    // REQUISITO: Implementar paginação (50 mensagens iniciais) e ordenação eficiente
+    const consultaPaginada = query(
+        mensagensRef,
+        orderByChild('timestamp'),
+        limitToLast(50) 
+    );
+
+    // REQUISITO: Manter performance com 500+ mensagens usando onChildAdded
+    onChildAdded(consultaPaginada, (snapshot) => {
+        const idMensagem = snapshot.key;
+
+        // Evita duplicatas se a função for chamada novamente
+        if (mensagensRenderizadas.has(idMensagem)) return;
+
+        const dados = snapshot.val();
+        const usuarioAtual = auth.currentUser;
+        if (!usuarioAtual) return;
+        const meuUid = usuarioAtual.uid;
+
+        // REQUISITO: Filtrar mensagens privadas corretamente (sender ou receiver)
+        const podeVer = 
+            dados.visibility === true || 
+            dados.receiver_id === meuUid || 
+            dados.sender_id === meuUid;
+
+        if (podeVer) {
+            renderizarMensagem(dados, idMensagem);
+            mensagensRenderizadas.add(idMensagem);
+            
+            // Garante que o scroll desça apenas para novas mensagens
+            chat.scrollTop = chat.scrollHeight;
+        }
+    });
+};
+
+// Lógica para filtrar mensagens visualmente sem nova consulta ao banco
+const filtrarBuscaTexto = (termo) => {
+    const termoBaixo = termo.toLowerCase();
+    document.querySelectorAll('.msgBox').forEach(msg => {
+        const conteudo = msg.querySelector('.msgBoxText').textContent.toLowerCase();
+        msg.style.display = conteudo.includes(termoBaixo) ? "flex" : "none";
+    });
+};
+
+
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        carregarMensagens();
+    }
+});
+
+
+carregarMensagens();
+
+
+function renderizarMensagem(dados, id) {
+    const usuarioAtual = auth.currentUser;
     const msgBox = document.createElement("div");
     msgBox.classList.add("msgBox");
-    msgBox.tabIndex=0;
+    msgBox.dataset.id = id; 
+
+    const isMine = dados.sender_id === usuarioAtual?.uid;
     
-    const isMine = Math.random() > 0.5;
+    
     msgBox.classList.add(isMine ? "sent" : "received");
-    
-    /*
-    const photo = document.createElement("div");
-    photo.classList.add("msgBoxPhoto");
-    */
+    msgBox.classList.add(isMine ? "myMsg" : "otherMsg"); 
+
+    //ÍCONE E COR PRIVADA ---
+    let bubbleIcon = "assets/publicmsg.svg";
+    if (dados.visibility === false) {
+        bubbleIcon = "assets/privatemsg.svg";
+        msgBox.classList.add("private"); 
+    }
 
     const bubble = document.createElement("div");
     bubble.classList.add("msgBoxMessage");
+    // Adiciona position relative para que o ícone fique preso no canto da bolha
+    bubble.style.position = "relative"; 
     
+    //CRIAÇÃO DO ÍCONE SVG ---
+    const icone = document.createElement("img");
+    icone.src = bubbleIcon;
+    icone.classList.add("bubble-corner-icon");
     
     const user = document.createElement("div");
     user.classList.add("msgBoxUser");
-    user.textContent = "User";
+    
+    //INDICADOR DE "PARA:"
+    let textoDirecionamento = "";
+    if (dados.receiver_id) {
+        if (isMine) {
+            textoDirecionamento = ` (para ${dados.receiver_name})`;
+        } else if (dados.receiver_id === usuarioAtual?.uid) {
+            textoDirecionamento = ` (para você)`;
+        } else {
+            textoDirecionamento = ` (para ${dados.receiver_name})`;
+        }
+    }
+    user.textContent = (isMine ? "Você" : dados.sender_name) + textoDirecionamento;
 
     const text = document.createElement("div");
     text.classList.add("msgBoxText");
-    text.textContent = msg;
+    text.textContent = dados.message_text; 
 
     const hour = document.createElement("div");
     hour.classList.add("msgBoxHour");
-    const now = new Date();
-    hour.textContent = now.getHours() + ":" +
-                    String(now.getMinutes()).padStart(2, "0");
+    
+    hour.style.display = "flex";
+    hour.style.alignItems = "center";
+    hour.style.gap = "4px";
+    hour.style.justifyContent = "flex-end";
+
+   const timeText = document.createElement("span");
+    timeText.textContent = dados.timestamp ? dados.timestamp.split(' ')[1].slice(0, 5) : "--:--";
 
     
+    icone.className = ""; 
+    icone.style.width = "15px";
+    icone.style.height = "15px";
 
+   
+    hour.append(icone, timeText);
+
+    
     bubble.append(user, text, hour);
-    //msgBox.append(photo, bubble);
     msgBox.append(bubble);
-
+    
+    msgBox.setAttribute('data-visibility', dados.visibility ? 'publica' : 'privada');
     msgBox.setAttribute("role", "article");
-    msgBox.setAttribute("aria-label",
-    `Nova mensagem de ${user.textContent}: ${msg}`
-    )
+    msgBox.setAttribute("aria-label", `Nova mensagem de ${user.textContent}: ${dados.message_text}`);
 
     chat.appendChild(msgBox);
-
     chat.scrollTop = chat.scrollHeight;
 
     const audio = document.getElementById("beep");
-    audio.play();
-    input.focus();
-    input.value="";
+    if(audio) audio.play().catch(e => console.log("Autoplay bloqueado pelo browser"));
 }
-
 
 
 chat.addEventListener("click", selectMessage);
@@ -133,15 +228,9 @@ function selectMessage(event)
         })
     }
 }
-
-
-deleteBtn.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    deleteMessage(event);
-});
-deleteBtn.addEventListener("click", deleteMessage);
-
-function deleteMessage(event){
+/*
+deleteBtn.addEventListener("click", () => 
+{
     document.querySelectorAll(".msgBox.selected")
     .forEach(el => el.remove());
 
@@ -152,52 +241,30 @@ function deleteMessage(event){
 
 
 
-switchBtn.addEventListener("click", () => 
-{
+switchBtn.addEventListener("change", () => {
+   
     document.body.classList.toggle("dark");
-})
 
+    if (document.body.classList.contains("dark")) {
+        localStorage.setItem("tema", "dark");
+    } else {
+        localStorage.setItem("tema", "light");
+    }
+});
 
-addUserBtn.addEventListener("click", addUser);
-function addUser(event)
-{
-    const container = document.getElementById("userList");
+// Função que checa o tema salvo ao iniciar
+window.addEventListener("DOMContentLoaded", () => {
+    const temaSalvo = localStorage.getItem("tema");
 
-    const newBox = document.createElement("div");
-    //newBox.classList.add("userBox", "new");
-    newBox.classList.add("userBox");
-    newBox.tabIndex="0";
+    
+    if (temaSalvo === "dark") {
+        document.body.classList.add("dark");
+        
+       if (switchBtn) switchBtn.checked = true;
+    }
+});
 
-    const photo = document.createElement("div");
-    photo.classList.add("userBoxPhoto");
-    const img = document.createElement("img");
-    img.src = "../assets/user.png";
-    img.alt = "";
-    photo.appendChild(img);
-
-    const name = document.createElement("div");
-    name.classList.add("userBoxName");
-    name.textContent = "User";
-
-    const status = document.createElement("div");
-    status.classList.add("userBoxStatus");
-    const dot = document.createElement("div");
-    dot.classList.add("statusDot", "online");
-    status.appendChild(dot);
-
-    newBox.append(photo, name, status);
-    container.appendChild(newBox);
-
-    /*
-    requestAnimationFrame(() => {
-        newBox.classList.remove("new");
-    });
-    */
-
-    const counter = document.getElementById("counter");
-    counter.textContent = container.children.length;
-
-}
+*/
 
 
 
@@ -331,8 +398,9 @@ dialog.addEventListener("close", () => {
 });
 
 
-confirmBtn.addEventListener("click", () => {
-  window.location.href = "login.html";
+const confirmLogout = document.getElementById("confirmLogout");
+confirmLogout.addEventListener("click", () => {
+    fazerLogout();
 });
 
 
@@ -344,8 +412,101 @@ fetch("assets/logo.svg")
 
 
 
-const toggleBtn = document.getElementById("toggleAside");
-const aside = document.querySelector("aside");
-toggleBtn.addEventListener("click", () => {
-    aside.classList.toggle("active");
-})
+document.querySelectorAll('input[name="category"]').forEach(input => {
+    input.addEventListener('change', (e) => {
+        document.getElementById('selected-value').innerText = e.target.nextElementSibling.innerText;
+        document.getElementById('options-view-button').checked = false; // Fecha o menu
+    });
+});
+
+// Seleciona todos os inputs de rádio
+document.querySelectorAll('input[name="category"]').forEach(input => {
+    input.addEventListener('change', function() {
+        // 1. Pega o ícone da lista (li)
+        const iconInLi = this.parentElement.querySelector('i');
+        const mainIcon = document.getElementById('main-icon');
+        
+        // 2. Atualiza o ícone sem apagar o resto
+        if (iconInLi && mainIcon) {
+            mainIcon.className = iconInLi.className; // Copia as classes do ícone
+            mainIcon.classList.remove('me-2'); // Remove a margem lateral se necessário
+        }
+
+        // 3. Atualiza APENAS o texto do span
+        const textLabel = this.getAttribute('data-label');
+        document.getElementById('selected-value').textContent = textLabel;
+
+        // 4. Fecha o menu
+        document.getElementById('options-view-button').checked = false;
+    });
+});
+
+
+function inicializarTema() {
+    const switchBtn = document.getElementById("switchThemeBtn");
+    const temaSalvo = localStorage.getItem("tema");
+
+    if (temaSalvo === "dark") {
+        document.body.classList.add("dark");
+        if (switchBtn) switchBtn.checked = true;
+    }
+
+    if (switchBtn) {
+        switchBtn.addEventListener("change", () => {
+            document.body.classList.toggle("dark");
+            if (document.body.classList.contains("dark")) {
+                localStorage.setItem("tema", "dark");
+            } else {
+                localStorage.setItem("tema", "light");
+            }
+        });
+    }
+}
+
+inicializarTema();
+
+const radiosFiltro = document.querySelectorAll('input[name="category"]');
+
+radiosFiltro.forEach(radio => {
+    radio.addEventListener('change', function() {
+        const filtroSelecionado = this.value;
+        const mensagens = document.querySelectorAll(".msgBox");
+
+        // PERFORMANCE: Filtragem visual direta no DOM
+        mensagens.forEach(msg => {
+            const visibilidadeMsg = msg.getAttribute('data-visibility');
+
+            if (filtroSelecionado === "todas") {
+                msg.style.display = "flex";
+            } else {
+                msg.style.display = (visibilidadeMsg === filtroSelecionado) ? "flex" : "none";
+            }
+        });
+
+        // Atualiza o visual do botão principal
+        const textLabel = this.nextElementSibling.textContent;
+        document.getElementById('selected-value').textContent = textLabel;
+        
+        // DESAFIO TÉCNICO: Fecha o menu desmarcando o checkbox
+        document.getElementById('options-view-button').checked = false;
+        
+        // Garante o scroll no final
+        const chat = document.getElementById("mainChat");
+        if(chat) chat.scrollTop = chat.scrollHeight;
+    });
+});
+
+
+
+// Resolve: "Como combinar múltiplos filtros?"
+function deveExibir(dados) {
+    const usuarioAtual = auth.currentUser;
+    if (!usuarioAtual) return false;
+    const meuUid = usuarioAtual.uid;
+
+    // Filtra privadas corretamente (sender ou receiver)
+    return dados.visibility === true || 
+           dados.receiver_id === meuUid || 
+           dados.sender_id === meuUid;
+}
+
