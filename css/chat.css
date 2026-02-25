@@ -571,11 +571,11 @@ header button:hover
     border: none;
     width: 4vw;
     min-width: 50px;
-    max-width: 60px;
+    max-width: 50px;
     aspect-ratio: 1/1;
     border-radius: 50%;
     color: var(--c4);
-    padding: 8px;
+    padding: 1px;
 }
 
 .writeArea button svg
@@ -633,11 +633,64 @@ header button:hover
 }
 
 
-.msgBoxTimeContainer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 4px;
-    font-size: 0.75rem; /* Menor que o texto */
-    color: #888;      
+/****************** botões/ícones público-privado ****************************/
+
+/* botão direcionar mensagem */
+.btn-privado {
+    background-color: white;
+    color: #184B90;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    margin-top: 8px;
+    font-size: 12px;
+    font-weight: bolder;
+    cursor: pointer;
+    width: 40%;
+    transition: filter 0.2s ease, transform 0.2s ease;
 }
+
+.btn-privado:hover {
+    filter: brightness(1.2);
+    transform: scale(1.02);
+}
+
+/* ícones de canto das mensagens */
+.msg { position: relative; }
+
+.myMsg .bubble-corner-icon { left: 8px; }
+.otherMsg .bubble-corner-icon { right: 8px; }
+.myMsg .msg-content-wrapper { padding-left: 20px; }
+.otherMsg .msg-content-wrapper { padding-right: 20px; }
+
+/* cor da mensagem privada */
+.msgBox.private .msgBoxMessage { 
+    background-color: #bcd9f3; 
+    border: 1px solid #bcd9f3; 
+    color: black; 
+}
+
+.dark .msgBox.private .msgBoxMessage {
+    background-color: #5158a3; 
+    border: 1px solid #5158a3;
+    color: #f1f1f1; 
+}
+.dark .msgBox.private .msgBoxUser {
+    color: #f1f1f1; 
+}
+
+.msg-directed-info { font-size: 11px; font-style: italic; opacity: 0.8; }
+.hidden { display: none !important; }
+
+.round-btn:hover {
+    transform: scale(1.05);
+}
+
+.round-btn img {
+    width: 100%;
+    height: 100%;
+}
+
+
+
+
