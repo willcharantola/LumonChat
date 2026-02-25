@@ -115,10 +115,25 @@ function renderizarMensagem(dados, id) {
 
     const hour = document.createElement("div");
     hour.classList.add("msgBoxHour");
-    hour.textContent = dados.timestamp ? dados.timestamp.split(' ')[1].slice(0, 5) : "--:--";
+    
+    hour.style.display = "flex";
+    hour.style.alignItems = "center";
+    hour.style.gap = "4px";
+    hour.style.justifyContent = "flex-end";
 
-    //ÍCONE NA BOLHA ---
-    bubble.append(icone, user, text, hour);
+   const timeText = document.createElement("span");
+    timeText.textContent = dados.timestamp ? dados.timestamp.split(' ')[1].slice(0, 5) : "--:--";
+
+    
+    icone.className = ""; 
+    icone.style.width = "15px";
+    icone.style.height = "15px";
+
+   
+    hour.append(icone, timeText);
+
+    
+    bubble.append(user, text, hour);
     msgBox.append(bubble);
 
     msgBox.setAttribute("role", "article");

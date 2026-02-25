@@ -7,7 +7,7 @@ const userListContainer = document.querySelector(".userBoxContainer");
 const userCounter = document.querySelector(".userCount");
 
 
- //Função para gerenciar a PRÓPRIA presença
+ //gerenciar a presença
 export const iniciarSistemaPresenca = (usuario) => {
 
     const connectedRef = ref(database, '.info/connected');
@@ -19,7 +19,7 @@ export const iniciarSistemaPresenca = (usuario) => {
         name: usuario.displayName || "Usuário",
         email: usuario.email || "sem-email",
         image: usuario.photoURL || "assets/user.png",
-        color: "#17407a" // Cor padrão provisória
+        color: "#17407a"
     };
 
     onValue(connectedRef, (snap) => {
@@ -41,7 +41,7 @@ export const iniciarSistemaPresenca = (usuario) => {
                 lastSeen: serverTimestamp()
             };
 
-            // registra o evento de desconexão usando .set() com os 7 campos
+            // registra o evento de desconexão com os 7 campos
             onDisconnect(myPresenceRef).set(dadosOffline).then(() => {
                 set(myPresenceRef, dadosOnline);
             }).catch((erro) => {
@@ -74,7 +74,7 @@ const escutarUsuariosAtivos = () => {
             }
         });
 
-        // atualiza o contador no HTML
+        // atualiza o contador 
         userCounter.innerHTML = `<span>Usuários conectados: ${contadorOnline}</span>`;
     });
 };
@@ -105,39 +105,38 @@ const renderizarUsuarioNaLista = (uid, dados) => {
     dot.classList.add("statusDot", dados.status);
     status.appendChild(dot);
 
-    // APENAS o botão de Direcionar (sem botão de remover)
+    // botão de direcionar 
     const btnPrivado = document.createElement("button");
     btnPrivado.textContent = "Direcionar mensagem"; 
     btnPrivado.classList.add("btn-privado", "hidden");
     
-    // Mostra o botão ao clicar na caixinha do usuário
+    // mostrar botão ao clicar no usuário
     newBox.addEventListener("click", () => {
         document.querySelectorAll(".btn-privado").forEach(btn => btn.classList.add("hidden"));
         btnPrivado.classList.remove("hidden");
     });
 
-    // Quando clica em "Direcionar mensagem"
+    // identifica o clique em "direcionar mensagem"
     btnPrivado.addEventListener("click", (e) => {
-        e.stopPropagation(); // Impede que o clique feche o botão
+        e.stopPropagation(); 
         
-        // Verifica se o usuário não está tentando mandar mensagem para ele mesmo
+        // verifica se não está tentando mandar mensagem para si mesmo
         
         if (auth.currentUser && uid === auth.currentUser.uid) {
             alert("Você não pode direcionar uma mensagem para si mesmo!");
             return;
         }
 
-        selecionarDestinatario(uid, dados.name); // Marca o usuário lá no HTML!
+        selecionarDestinatario(uid, dados.name);
     }); 
 
-    // Adiciona os elementos na caixa (note que não há botão de delUserBtn aqui)
     newBox.append(photo, name, status, btnPrivado); 
     userListContainer.appendChild(newBox);
 };
 
 
 
-//Função para forçar o status offline antes do logout
+//forçar o status offline antes do logout
 export const marcarComoOffline = async (usuario) => {
     if (!usuario) return;
     
