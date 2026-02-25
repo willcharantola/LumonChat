@@ -14,6 +14,10 @@
     <script type="module" src="./js/config.js"></script>
     <script type="module" src="./js/auth.js"></script>
     <script type="module" src="./js/ui.js"></script>
+    <script type="module" src="./js/presence.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+   
 
   </head>
   
@@ -55,6 +59,8 @@
       <div class="logo">
         
       </div>
+
+      
       <button id="switchThemeBtn" aria-label="Trocar tema claro/escuro" 
       tabindex="0">
         <img src="assets/lightbulb.png" alt="">
@@ -70,10 +76,14 @@
     
     <form class="writeArea">
 
+    
+
+
+
       <h2> Caixa de texto </h2>
 
       <label for="newMsg" class="hidden">Message</label>
-      <input type="text" id="newMsg" aria-label="Digite sua mensagem">
+      <input type="text" id="newMsg" aria-label="Digite sua mensagem" placeholder="Digite sua mensagem">
       
         <button type="submit" id="sendButton" aria-label="Enviar mensagem">
             <svg viewBox="0 0 24 24" class="icon" aria-hidden="true">
@@ -84,7 +94,7 @@
     </form>
 
 
-    <button id="addUserButton"> Add User </button>
+    
 
     <dialog id="alertBox" aria-labelledby="logoutTitle">
       <div class="exitContent">
@@ -95,6 +105,13 @@
     </dialog>
 
     <audio id="beep" src="assets/msgbeep.mp3"></audio>
+
+
+    <script>
+        if (localStorage.getItem("tema") === "dark") {
+          document.documentElement.classList.add("dark");
+        }
+   </script>
 
   </body>
   
