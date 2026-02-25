@@ -73,8 +73,8 @@ export const enviarMensagem = async (texto) => {
         sender_id: usuario.uid,
         sender_name: usuario.displayName || "Usuário",
         sender_image: usuario.photoURL || "assets/user.png",
-        receiver_id: destinatarioAtual ? destinatarioAtual.uid : null,
-        receiver_name: destinatarioAtual ? destinatarioAtual.nome : null,
+        receiver_id: destinatarioAtual ? destinatarioAtual.uid : "",
+        receiver_name: destinatarioAtual ? destinatarioAtual.nome : "",
         visibility: !isPrivateMode, 
         message_text: texto.trim(),
         color: "#17407a" 
