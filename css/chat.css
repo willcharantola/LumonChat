@@ -756,7 +756,7 @@ input:checked + .slider:before {
 /* Estilo Base do Dropdown */
 .category-select {
   position: relative;
-  width: 220px;
+  width: auto;
   margin-bottom: 15px;
   z-index: 100; /* Garante que as opções fiquem sobre as mensagens */
 }
@@ -819,6 +819,7 @@ input:checked + .slider:before {
   cursor: pointer;
   color: #333;
   transition: background 0.2s;
+  gap: 1rem;
 }
 
 .option:hover {

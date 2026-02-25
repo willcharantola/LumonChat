@@ -1,6 +1,6 @@
 import {fazerLogout} from './auth.js';
 import { database, auth } from './config.js';
-import { ref, onValue, query, orderByChild, limitToLast, onChildAdded } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { ref, onValue, query, orderByChild, limitToLast, onChildAdded, endBefore, get } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 import { enviarMensagem } from './messages.js';
 
 const sendButton = document.getElementById("sendButton");
@@ -414,7 +414,6 @@ function inicializarTema() {
 
 inicializarTema();
 
-// Seleciona todos os rádios do filtro de mensagens
 const radiosFiltro = document.querySelectorAll('input[name="category"]');
 
 radiosFiltro.forEach(radio => {
@@ -422,22 +421,41 @@ radiosFiltro.forEach(radio => {
         const filtroSelecionado = this.value;
         const mensagens = document.querySelectorAll(".msgBox");
 
+        // PERFORMANCE: Filtragem visual direta no DOM
         mensagens.forEach(msg => {
-            // Requisito: Filtrar com base no atributo data-visibility definido na renderização
             const visibilidadeMsg = msg.getAttribute('data-visibility');
 
             if (filtroSelecionado === "todas") {
                 msg.style.display = "flex";
             } else {
-                // Desafio técnico: Combinar filtros visualmente
                 msg.style.display = (visibilidadeMsg === filtroSelecionado) ? "flex" : "none";
             }
         });
 
-        // Fecha o menu após a seleção
+        // Atualiza o visual do botão principal
+        const textLabel = this.nextElementSibling.textContent;
+        document.getElementById('selected-value').textContent = textLabel;
+        
+        // DESAFIO TÉCNICO: Fecha o menu desmarcando o checkbox
         document.getElementById('options-view-button').checked = false;
         
-        // Mantém o scroll no final
-        chat.scrollTop = chat.scrollHeight;
+        // Garante o scroll no final
+        const chat = document.getElementById("mainChat");
+        if(chat) chat.scrollTop = chat.scrollHeight;
     });
 });
+
+
+
+// Resolve: "Como combinar múltiplos filtros?"
+function deveExibir(dados) {
+    const usuarioAtual = auth.currentUser;
+    if (!usuarioAtual) return false;
+    const meuUid = usuarioAtual.uid;
+
+    // Filtra privadas corretamente (sender ou receiver)
+    return dados.visibility === true || 
+           dados.receiver_id === meuUid || 
+           dados.sender_id === meuUid;
+}
+
