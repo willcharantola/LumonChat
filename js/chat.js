@@ -1,6 +1,6 @@
 import {fazerLogout} from './auth.js';
 import { database, auth } from './config.js';
-import { ref, push, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
 const sendButton = document.getElementById("sendButton");
 const chat = document.getElementById("mainChat");
@@ -28,8 +28,7 @@ async function createMessage(event) {
         const mensagensRef = ref(database, 'messages');
         const novaMsgRef = push(mensagensRef);
 
-        //FIZ ALGUMAS ALTERAÇÕES EM RELAÇÃO AO QUE O PROF PEDIU, MAS ESTÁ FUNCIONANDO,
-        //  LEMBRAR DE CONVERSAR COM ELE NA REUNIÃO DE SEGUNDA FEIRA
+      
     await set(novaMsgRef, {
          message_id: String(novaMsgRef.key), 
          timestamp: String(new Date().toLocaleString('pt-BR')), 
@@ -96,11 +95,29 @@ function renderizarMensagem(dados, id) {
     text.classList.add("msgBoxText");
     text.textContent = dados.message_text; 
 
-    const hour = document.createElement("div");
-    hour.classList.add("msgBoxHour");
-    hour.textContent = dados.timestamp ? dados.timestamp.split(' ')[1].slice(0, 5) : "--:--";
+   const timeContainer = document.createElement("div");
+    timeContainer.classList.add("msgBoxTimeContainer"); // Container para alinhar ambos
 
-    bubble.append(user, text, hour);
+    // Extrai a Data
+    const datePart = dados.timestamp ? dados.timestamp.split(' ')[0] : "";
+    // Formata para o padrão brasileiro
+    const dateFormatted = datePart.split('-').reverse().join('/');
+
+    // Extrai a Hora 
+    const hourFormatted = dados.timestamp ? dados.timestamp.split(' ')[1].slice(0, 5) : "--:--";
+
+    const dateSpan = document.createElement("span");
+    dateSpan.classList.add("msgBoxDate");
+    dateSpan.textContent = dateFormatted;
+
+    const hourSpan = document.createElement("span");
+    hourSpan.classList.add("msgBoxHour");
+    hourSpan.textContent = hourFormatted;
+
+    // Adiciona ambos ao container (ou direto na bubble)
+    timeContainer.append(dateSpan, " ", hourSpan);
+
+    bubble.append(user, text, timeContainer);
     msgBox.append(bubble);
 
     // CORREÇÃO DO ARIA-LABEL: Usando dados.message_text em vez de msg
@@ -164,12 +181,29 @@ deleteBtn.addEventListener("click", () =>
 
 
 
-switchBtn.addEventListener("click", () => 
-{
+switchBtn.addEventListener("click", () => {
+   
     document.body.classList.toggle("dark");
-})
 
+    if (document.body.classList.contains("dark")) {
+        localStorage.setItem("tema", "dark");
+    } else {
+        localStorage.setItem("tema", "light");
+    }
+});
 
+// Função que checa o tema salvo ao iniciar
+window.addEventListener("DOMContentLoaded", () => {
+    const temaSalvo = localStorage.getItem("tema");
+
+    
+    if (temaSalvo === "dark") {
+        document.body.classList.add("dark");
+        
+        // Se o seu switchBtn for um checkbox, adicione esta linha:
+        // switchBtn.checked = true; 
+    }
+});
 
 
 
@@ -293,4 +327,31 @@ fetch("assets/logo.svg")
 
 
 
+document.querySelectorAll('input[name="category"]').forEach(input => {
+    input.addEventListener('change', (e) => {
+        document.getElementById('selected-value').innerText = e.target.nextElementSibling.innerText;
+        document.getElementById('options-view-button').checked = false; // Fecha o menu
+    });
+});
 
+// Seleciona todos os inputs de rádio
+document.querySelectorAll('input[name="category"]').forEach(input => {
+    input.addEventListener('change', function() {
+        // 1. Pega o ícone da lista (li)
+        const iconInLi = this.parentElement.querySelector('i');
+        const mainIcon = document.getElementById('main-icon');
+        
+        // 2. Atualiza o ícone sem apagar o resto
+        if (iconInLi && mainIcon) {
+            mainIcon.className = iconInLi.className; // Copia as classes do ícone
+            mainIcon.classList.remove('me-2'); // Remove a margem lateral se necessário
+        }
+
+        // 3. Atualiza APENAS o texto do span
+        const textLabel = this.getAttribute('data-label');
+        document.getElementById('selected-value').textContent = textLabel;
+
+        // 4. Fecha o menu
+        document.getElementById('options-view-button').checked = false;
+    });
+});

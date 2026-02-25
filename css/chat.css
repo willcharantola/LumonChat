@@ -542,7 +542,7 @@ header button:hover
     min-height: 70px;
     padding: 0px 15px;
     gap: 20px;
-    align-items:flex-end;
+   
 }   
 
 .writeArea input
@@ -633,5 +633,11 @@ header button:hover
 }
 
 
-
-
+.msgBoxTimeContainer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 0.75rem; /* Menor que o texto */
+    color: #888;      
+}
