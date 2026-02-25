@@ -193,12 +193,29 @@ deleteBtn.addEventListener("click", () =>
 
 
 
-switchBtn.addEventListener("click", () => 
-{
+switchBtn.addEventListener("click", () => {
+   
     document.body.classList.toggle("dark");
-})
 
+    if (document.body.classList.contains("dark")) {
+        localStorage.setItem("tema", "dark");
+    } else {
+        localStorage.setItem("tema", "light");
+    }
+});
 
+// Função que checa o tema salvo ao iniciar
+window.addEventListener("DOMContentLoaded", () => {
+    const temaSalvo = localStorage.getItem("tema");
+
+    
+    if (temaSalvo === "dark") {
+        document.body.classList.add("dark");
+        
+        // Se o seu switchBtn for um checkbox, adicione esta linha:
+        // switchBtn.checked = true; 
+    }
+});
 
 
 
@@ -322,4 +339,31 @@ fetch("assets/logo.svg")
 
 
 
+document.querySelectorAll('input[name="category"]').forEach(input => {
+    input.addEventListener('change', (e) => {
+        document.getElementById('selected-value').innerText = e.target.nextElementSibling.innerText;
+        document.getElementById('options-view-button').checked = false; // Fecha o menu
+    });
+});
 
+// Seleciona todos os inputs de rádio
+document.querySelectorAll('input[name="category"]').forEach(input => {
+    input.addEventListener('change', function() {
+        // 1. Pega o ícone da lista (li)
+        const iconInLi = this.parentElement.querySelector('i');
+        const mainIcon = document.getElementById('main-icon');
+        
+        // 2. Atualiza o ícone sem apagar o resto
+        if (iconInLi && mainIcon) {
+            mainIcon.className = iconInLi.className; // Copia as classes do ícone
+            mainIcon.classList.remove('me-2'); // Remove a margem lateral se necessário
+        }
+
+        // 3. Atualiza APENAS o texto do span
+        const textLabel = this.getAttribute('data-label');
+        document.getElementById('selected-value').textContent = textLabel;
+
+        // 4. Fecha o menu
+        document.getElementById('options-view-button').checked = false;
+    });
+});

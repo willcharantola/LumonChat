@@ -542,7 +542,7 @@ header button:hover
     min-height: 70px;
     padding: 0px 15px;
     gap: 20px;
-    align-items:flex-end;
+   
 }   
 
 .writeArea input
