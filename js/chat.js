@@ -1,32 +1,40 @@
 import {fazerLogout} from './auth.js';
 import { database, auth } from './config.js';
-import { ref, onValue, query, orderByChild, limitToLast, onChildAdded, endBefore, get } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { ref, query, orderByChild, limitToLast, onChildAdded } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 import { enviarMensagem } from './messages.js';
+
 
 const sendButton = document.getElementById("sendButton");
 const chat = document.getElementById("mainChat");
-const deleteBtn = document.getElementById("delBtn");
 
 
-const delUserBtn = document.getElementById("delUserBtn");
-const switchStatusBtn = document.getElementById("userDetails");
 const logoutBtn = document.getElementById("logoutButton");
-const profileBtn = document.getElementById("profileBtn");
-
+const statusDot = document.getElementById("statusDot");
+const switchStatusBtn = document.getElementById("userDetails");
 const mensagensRenderizadas = new Set();
 
+/**
+ * Monitora o estado da autenticação. 
+ * Garante que as mensagens só sejam carregadas após o login do usuário.
+ */
 
-sendButton.addEventListener("click", (e) => {
-    e.preventDefault();
-    const input = document.getElementById("newMsg");
-    enviarMensagem(input.value);
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        carregarMensagens();
+    }
 });
 
 
-//carregando mensagens enviadas para o servidor 
 
 
 
+/* ==================================Mensagens===================================*/
+
+/**
+ * Realiza a busca inicial no Firebase.
+ * Implementa a paginação carregando apenas as últimas 50 mensagens para otimizar a performance.
+ */
 const carregarMensagens = () => {
     const mensagensRef = ref(database, 'messages');
 
@@ -37,11 +45,9 @@ const carregarMensagens = () => {
         limitToLast(50) 
     );
 
-    // REQUISITO: Manter performance com 500+ mensagens usando onChildAdded
     onChildAdded(consultaPaginada, (snapshot) => {
         const idMensagem = snapshot.key;
 
-        // Evita duplicatas se a função for chamada novamente
         if (mensagensRenderizadas.has(idMensagem)) return;
 
         const dados = snapshot.val();
@@ -49,7 +55,6 @@ const carregarMensagens = () => {
         if (!usuarioAtual) return;
         const meuUid = usuarioAtual.uid;
 
-        // REQUISITO: Filtrar mensagens privadas corretamente (sender ou receiver)
         const podeVer = 
             dados.visibility === true || 
             dados.receiver_id === meuUid || 
@@ -59,14 +64,41 @@ const carregarMensagens = () => {
             renderizarMensagem(dados, idMensagem);
             mensagensRenderizadas.add(idMensagem);
             
-            // Garante que o scroll desça apenas para novas mensagens
             chat.scrollTop = chat.scrollHeight;
         }
     });
 };
 
-// Lógica para filtrar mensagens visualmente sem nova consulta ao banco
-const filtrarBuscaTexto = (termo) => {
+
+sendButton.addEventListener("click", (e) => {
+    e.preventDefault();
+    const input = document.getElementById("newMsg");
+    enviarMensagem(input.value);
+});
+
+
+
+/**
+ * Valida a visibilidade da mensagem.
+ * Filtra para que o usuário veja apenas mensagens públicas ou privadas onde ele é o remetente ou destinatário.
+ */
+
+function deveExibir(dados) {
+    const usuarioAtual = auth.currentUser;
+    if (!usuarioAtual) return false;
+    const meuUid = usuarioAtual.uid;
+
+    // Filtra privadas corretamente (sender ou receiver)
+    return dados.visibility === true || 
+           dados.receiver_id === meuUid || 
+           dados.sender_id === meuUid;
+}
+
+
+/**
+ * Filtro de busca por texto.
+ * Realiza a filtragem diretamente nos elementos do DOM para evitar novas requisições ao servidor.
+ */const filtrarBuscaTexto = (termo) => {
     const termoBaixo = termo.toLowerCase();
     document.querySelectorAll('.msgBox').forEach(msg => {
         const conteudo = msg.querySelector('.msgBoxText').textContent.toLowerCase();
@@ -75,16 +107,15 @@ const filtrarBuscaTexto = (termo) => {
 };
 
 
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        carregarMensagens();
-    }
-});
 
 
-carregarMensagens();
+/* ===============================Renderização e Construção de Interface================================== */
 
+
+/**
+ * Constrói dinamicamente o HTML de cada mensagem.
+ * Define estilos para mensagens enviadas/recebidas e insere atributos de acessibilidade e metadados.
+ */
 
 function renderizarMensagem(dados, id) {
     const usuarioAtual = auth.currentUser;
@@ -98,7 +129,6 @@ function renderizarMensagem(dados, id) {
     msgBox.classList.add(isMine ? "sent" : "received");
     msgBox.classList.add(isMine ? "myMsg" : "otherMsg"); 
 
-    //ÍCONE E COR PRIVADA ---
     let bubbleIcon = "assets/publicmsg.svg";
     if (dados.visibility === false) {
         bubbleIcon = "assets/privatemsg.svg";
@@ -107,10 +137,8 @@ function renderizarMensagem(dados, id) {
 
     const bubble = document.createElement("div");
     bubble.classList.add("msgBoxMessage");
-    // Adiciona position relative para que o ícone fique preso no canto da bolha
     bubble.style.position = "relative"; 
     
-    //CRIAÇÃO DO ÍCONE SVG ---
     const icone = document.createElement("img");
     icone.src = bubbleIcon;
     icone.classList.add("bubble-corner-icon");
@@ -170,101 +198,10 @@ function renderizarMensagem(dados, id) {
 }
 
 
-chat.addEventListener("click", selectMessage);
-chat.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    selectMessage(event);
-});
-
-function selectMessage(event)
-{
-
-    const box = event.target.closest(".msgBox");
-
-    if (!box) 
-    {
-        document.querySelectorAll(".msgBox.selected")
-        .forEach(el => el.classList.remove("selected"));
-        deleteBtn.style.display = "none";
-        deleteBtn.setAttribute("tabindex", "-1");
-        chat.appendChild(deleteBtn);
-        return;
-    }
-
-    if (box.classList.contains("selected"))
-    {
-        box.classList.remove("selected");
-        deleteBtn.style.display = "none";
-        deleteBtn.setAttribute("tabindex", "-1");
-        chat.appendChild(deleteBtn);
-    } else {
-        document.querySelectorAll(".msgBox.selected")
-        .forEach(el => el.classList.remove("selected"));
-        box.classList.add("selected");
-
-        const rect = box.getBoundingClientRect();
-        deleteBtn.style.display = "block";
-        deleteBtn.setAttribute("tabindex", "0");
-        deleteBtn.style.transform = "translateY(-50%)";
-        deleteBtn.style.top = rect.top + window.scrollY + rect.height / 2 + "px";
-        box.appendChild(deleteBtn);
-
-        if (box.classList.contains("sent")) {
-            deleteBtn.style.left = rect.left + window.scrollX - 40 + "px";
-        } else {
-            deleteBtn.style.left = rect.right + window.scrollX + 10 + "px";
-        }
-  
-        document.addEventListener("focusin", (event) => {
-            const selected = document.querySelector(".msgBox.selected");
-            if (!selected) return;
-
-            if (!selected.contains(event.target) && !deleteBtn.contains(event.target)){
-                selected.classList.remove("selected");
-                deleteBtn.style.display = "none";
-                deleteBtn.setAttribute("tabindex", "-1");
-                chat.appendChild(deleteBtn);
-            }
-        })
-    }
-}
-/*
-deleteBtn.addEventListener("click", () => 
-{
-    document.querySelectorAll(".msgBox.selected")
-    .forEach(el => el.remove());
-
-    deleteBtn.style.display = "none";
-    deleteBtn.setAttribute("tabindex", "-1");
-    chat.append(deleteBtn);
-}
 
 
 
-switchBtn.addEventListener("change", () => {
-   
-    document.body.classList.toggle("dark");
 
-    if (document.body.classList.contains("dark")) {
-        localStorage.setItem("tema", "dark");
-    } else {
-        localStorage.setItem("tema", "light");
-    }
-});
-
-// Função que checa o tema salvo ao iniciar
-window.addEventListener("DOMContentLoaded", () => {
-    const temaSalvo = localStorage.getItem("tema");
-
-    
-    if (temaSalvo === "dark") {
-        document.body.classList.add("dark");
-        
-       if (switchBtn) switchBtn.checked = true;
-    }
-});
-
-*/
 
 
 
@@ -322,37 +259,7 @@ document.addEventListener("focusin", (event) => {
 });
 
 
-delUserBtn.addEventListener("keydown", (event) => {
-    if (event.key !== "Enter" && event.key !== " ") return;
-    deleteUser(event);
-});
-delUserBtn.addEventListener("click", deleteUser);
-function deleteUser(event){
-    const container = document.getElementById("userList");
 
-    document.querySelectorAll(".userBox.selected")
-    .forEach(el => el.remove());
-
-    delUserBtn.classList.remove("selected");
-
-    const counter = document.getElementById("counter");
-    counter.textContent = container.children.length;
-}
-
-
-switchStatusBtn.addEventListener("click", toggleStatus);
-function toggleStatus() {
-    const statusDesc = document.getElementById("statusDesc");
-    if (statusDot.classList.contains('online')) {
-        statusDot.classList.remove('online');
-        statusDot.classList.add('away');
-        statusDesc.textContent = "Away";
-    } else if (statusDot.classList.contains('away')) {
-        statusDot.classList.remove('away');
-        statusDot.classList.add('online');
-        statusDesc.textContent = "Online";
-    }
-}
 
 const dialog = document.getElementById("alertBox");
 const cancelBtn = document.getElementById("cancelLogout");
@@ -421,25 +328,54 @@ document.querySelectorAll('input[name="category"]').forEach(input => {
 
 // Seleciona todos os inputs de rádio
 document.querySelectorAll('input[name="category"]').forEach(input => {
+
     input.addEventListener('change', function() {
-        // 1. Pega o ícone da lista (li)
         const iconInLi = this.parentElement.querySelector('i');
         const mainIcon = document.getElementById('main-icon');
         
-        // 2. Atualiza o ícone sem apagar o resto
         if (iconInLi && mainIcon) {
-            mainIcon.className = iconInLi.className; // Copia as classes do ícone
-            mainIcon.classList.remove('me-2'); // Remove a margem lateral se necessário
+            mainIcon.className = iconInLi.className; 
+            mainIcon.classList.remove('me-2'); 
         }
 
-        // 3. Atualiza APENAS o texto do span
         const textLabel = this.getAttribute('data-label');
         document.getElementById('selected-value').textContent = textLabel;
 
-        // 4. Fecha o menu
         document.getElementById('options-view-button').checked = false;
     });
 });
+
+
+
+
+const radiosFiltro = document.querySelectorAll('input[name="category"]');
+
+radiosFiltro.forEach(radio => {
+    radio.addEventListener('change', function() {
+        const filtroSelecionado = this.value;
+        const mensagens = document.querySelectorAll(".msgBox");
+
+        // PERFORMANCE: Filtragem visual direta no DOM
+        mensagens.forEach(msg => {
+            const visibilidadeMsg = msg.getAttribute('data-visibility');
+
+            if (filtroSelecionado === "todas") {
+                msg.style.display = "flex";
+            } else {
+                msg.style.display = (visibilidadeMsg === filtroSelecionado) ? "flex" : "none";
+            }
+        });
+
+        const textLabel = this.nextElementSibling.textContent;
+        document.getElementById('selected-value').textContent = textLabel;
+        
+        document.getElementById('options-view-button').checked = false;
+        
+        const chat = document.getElementById("mainChat");
+        if(chat) chat.scrollTop = chat.scrollHeight;
+    });
+});
+
 
 
 function inicializarTema() {
@@ -465,48 +401,27 @@ function inicializarTema() {
 
 inicializarTema();
 
-const radiosFiltro = document.querySelectorAll('input[name="category"]');
-
-radiosFiltro.forEach(radio => {
-    radio.addEventListener('change', function() {
-        const filtroSelecionado = this.value;
-        const mensagens = document.querySelectorAll(".msgBox");
-
-        // PERFORMANCE: Filtragem visual direta no DOM
-        mensagens.forEach(msg => {
-            const visibilidadeMsg = msg.getAttribute('data-visibility');
-
-            if (filtroSelecionado === "todas") {
-                msg.style.display = "flex";
-            } else {
-                msg.style.display = (visibilidadeMsg === filtroSelecionado) ? "flex" : "none";
-            }
-        });
-
-        // Atualiza o visual do botão principal
-        const textLabel = this.nextElementSibling.textContent;
-        document.getElementById('selected-value').textContent = textLabel;
-        
-        // DESAFIO TÉCNICO: Fecha o menu desmarcando o checkbox
-        document.getElementById('options-view-button').checked = false;
-        
-        // Garante o scroll no final
-        const chat = document.getElementById("mainChat");
-        if(chat) chat.scrollTop = chat.scrollHeight;
-    });
-});
 
 
-
-// Resolve: "Como combinar múltiplos filtros?"
-function deveExibir(dados) {
-    const usuarioAtual = auth.currentUser;
-    if (!usuarioAtual) return false;
-    const meuUid = usuarioAtual.uid;
-
-    // Filtra privadas corretamente (sender ou receiver)
-    return dados.visibility === true || 
-           dados.receiver_id === meuUid || 
-           dados.sender_id === meuUid;
+switchStatusBtn.addEventListener("click", toggleStatus);
+function toggleStatus() {
+    const statusDesc = document.getElementById("statusDesc");
+    if (statusDot.classList.contains('online')) {
+        statusDot.classList.remove('online');
+        statusDot.classList.add('away');
+        statusDesc.textContent = "Away";
+    } else if (statusDot.classList.contains('away')) {
+        statusDot.classList.remove('away');
+        statusDot.classList.add('online');
+        statusDesc.textContent = "Online";
+    }
 }
 
+
+
+
+const toggleBtn = document.getElementById("toggleAside");
+const aside = document.querySelector("aside");
+toggleBtn.addEventListener("click", () => {
+    aside.classList.toggle("active");
+})
