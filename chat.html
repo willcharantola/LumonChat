@@ -56,6 +56,7 @@
 
 
     <header>
+      
       <button id="toggleAside" aria-label="Menu lateral">
         <img src="assets/menu.png" alt="" aria-hidden="true">
       </button>
@@ -63,54 +64,56 @@
         <img src="assets/logocompletagotabranca.svg" alt="Logo Lumon Chat" style="height: 40px; width: auto; object-fit: contain;">
       </div>
 
-   <div class="category-select">
-  <input type="checkbox" id="options-view-button" />
-
-  <label class="select-button" for="options-view-button">
-    <i id="main-icon" class="bi bi-globe"></i>
-    <div id="selected-value">Todas as Mensagens</div>
-    <i class="bi bi-chevron-down ms-auto"></i> </label>
-
-  <ul id="options">
-    <li>
-      <input type="radio" name="category" value="todas" id="todas" checked>
-      <label for="todas" class="option">
-        <i class="bi bi-chat-dots me-2"></i> Todas as Mensagens
-      </label>
-    </li>
-    <li>
-      <input type="radio" name="category" value="publica" id="publica_filter">
-      <label for="publica_filter" class="option">
-        <i class="bi bi-globe me-2"></i> Mensagem Pública
-      </label>
-    </li>
-    <li>
-      <input type="radio" name="category" value="privada" id="privada_filter">
-      <label for="privada_filter" class="option">
-        <i class="bi bi-lock me-2"></i> Mensagem Privada
-      </label>
-    </li>
-  </ul>
-</div>
 
 
+      <div class="category-select">
+        <input type="checkbox" id="options-view-button" />
 
-      
-     <div class="theme-switch-wrapper">
-    <label class="theme-switch" for="switchThemeBtn">
-        <input type="checkbox" id="switchThemeBtn" aria-label="Trocar tema claro/escuro">
-        <div class="slider round">
-            <i class="bi bi-sun-fill"></i>
-            <i class="bi bi-moon-stars-fill"></i>
-        </div>
-    </label>
-</div>
+        <label class="select-button" for="options-view-button">
+          <i id="main-icon" class="bi bi-globe"></i>
+          <div id="selected-value">Todas as Mensagens</div>
+          <i class="bi bi-chevron-down ms-auto"></i> </label>
+
+        <ul id="options">
+          <li>
+            <input type="radio" name="category" value="todas" id="todas" checked>
+            <label for="todas" class="option">
+              <i class="bi bi-chat-dots me-2"></i> Todas as Mensagens
+            </label>
+          </li>
+          <li>
+            <input type="radio" name="category" value="publica" id="publica_filter">
+            <label for="publica_filter" class="option">
+              <i class="bi bi-globe me-2"></i> Mensagem Pública
+            </label>
+          </li>
+          <li>
+            <input type="radio" name="category" value="privada" id="privada_filter">
+            <label for="privada_filter" class="option">
+              <i class="bi bi-lock me-2"></i> Mensagem Privada
+            </label>
+          </li>
+        </ul>
+      </div>
+
+
+
+          
+      <div class="theme-switch-wrapper">
+        <label class="theme-switch" for="switchThemeBtn">
+            <input type="checkbox" id="switchThemeBtn" aria-label="Trocar tema claro/escuro">
+            <div class="slider round">
+                <i class="bi bi-sun-fill"></i>
+                <i class="bi bi-moon-stars-fill"></i>
+            </div>
+        </label>
+      </div>
     </header>
+
 
     <main class="chat" id="mainChat"
       aria-live="polite" role="log" aria-relevant="additions" aria-atomic="false">
       <h2> Chat </h2>
-     
     </main>
 
     
