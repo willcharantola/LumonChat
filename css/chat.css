@@ -145,19 +145,10 @@ aside
     height: 50px;
     border-radius: 10px;
     border-bottom: 2px solid var(--c2);
-    /*
-    opacity: 1;
-    transform: translateX(0);
-    transition: opacity 0.3s ease, transform 0.3s ease;
-    */
+  
 }
 
-/*
-.userBox.new {
-    opacity: 0;
-    transform: translateX(-50px);
-}
-    */
+
 
 .userBox:hover
 {
@@ -292,7 +283,7 @@ aside
 #userName
 {
     grid-column: 1 / span 12;
-    font-size: clamp(14px, 2.5vw, 24px);
+    font-size: clamp(12px, 2.5vw, 9px);
     text-transform:capitalize;
 }
 
@@ -479,19 +470,7 @@ header button:hover
     background-color: color-mix(in srgb, var(--c3) 85%, black); 
 }
 
-/*
-.msgBoxPhoto
-{
-    grid-column: 1;
-    justify-self: center;
-    align-self: center;
-    max-width: 30px;
-    max-height: 30px;
-    padding: 10px;
-    border-radius: 20px;
-    background-color: red;
-}
-    */
+
 
         
 .msgBoxMessage
@@ -783,11 +762,11 @@ input:checked + .slider:before {
   position: relative;
   width: auto;
   margin-bottom: 15px;
-  z-index: 100; /* Garante que as opções fiquem sobre as mensagens */
+  z-index: 100; 
 }
 
 #options-view-button {
-  display: none; /* Esconde o checkbox de controle */
+  display: none; 
 }
 
 /* Botão Principal */
@@ -807,7 +786,6 @@ input:checked + .slider:before {
   background-color: #1e54a3;
 }
 
-/* Lista de Opções */
 #options {
   position: absolute;
   top: 110%;
@@ -870,16 +848,16 @@ body.dark .option:hover {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Garante que o menu apareça quando o checkbox estiver marcado */
 #options-view-button:checked ~ #options {
   display: block !important;
   opacity: 1;
   visibility: visible;
 }
-/* Opcional: Rotacionar uma setinha se você tiver uma */
 #options-view-button:checked ~ .select-button i.bi-chevron-down {
   transform: rotate(180deg);
 
+
+  /******************************************************************************************************/
 @media (max-width: 768px) 
 {
 
@@ -926,5 +904,7 @@ aside.active {
 }
 
 
+
+}
 
 }

@@ -9,4 +9,3 @@ export const exibirDadosUsuario = (user) => {
     if (email) email.innerText = user.email;
     if (foto) foto.src = user.photoURL;
 };
-
