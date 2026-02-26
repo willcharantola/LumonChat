@@ -7,15 +7,11 @@ import { enviarMensagem } from './messages.js';
 
 const sendButton = document.getElementById("sendButton");
 const chat = document.getElementById("mainChat");
-const deleteBtn = document.getElementById("delBtn");
 
 
 const logoutBtn = document.getElementById("logoutButton");
-const profileBtn = document.getElementById("profileBtn");
-
+const statusDot = document.getElementById("statusDot");
 const switchStatusBtn = document.getElementById("userDetails");
-
-
 const mensagensRenderizadas = new Set();
 
 /**
@@ -73,7 +69,6 @@ const carregarMensagens = () => {
     });
 };
 
-carregarMensagens();
 
 sendButton.addEventListener("click", (e) => {
     e.preventDefault();
@@ -333,22 +328,19 @@ document.querySelectorAll('input[name="category"]').forEach(input => {
 
 // Seleciona todos os inputs de rádio
 document.querySelectorAll('input[name="category"]').forEach(input => {
+
     input.addEventListener('change', function() {
-        // 1. Pega o ícone da lista (li)
         const iconInLi = this.parentElement.querySelector('i');
         const mainIcon = document.getElementById('main-icon');
         
-        // 2. Atualiza o ícone sem apagar o resto
         if (iconInLi && mainIcon) {
-            mainIcon.className = iconInLi.className; // Copia as classes do ícone
-            mainIcon.classList.remove('me-2'); // Remove a margem lateral se necessário
+            mainIcon.className = iconInLi.className; 
+            mainIcon.classList.remove('me-2'); 
         }
 
-        // 3. Atualiza APENAS o texto do span
         const textLabel = this.getAttribute('data-label');
         document.getElementById('selected-value').textContent = textLabel;
 
-        // 4. Fecha o menu
         document.getElementById('options-view-button').checked = false;
     });
 });
@@ -374,14 +366,11 @@ radiosFiltro.forEach(radio => {
             }
         });
 
-        // Atualiza o visual do botão principal
         const textLabel = this.nextElementSibling.textContent;
         document.getElementById('selected-value').textContent = textLabel;
         
-        // DESAFIO TÉCNICO: Fecha o menu desmarcando o checkbox
         document.getElementById('options-view-button').checked = false;
         
-        // Garante o scroll no final
         const chat = document.getElementById("mainChat");
         if(chat) chat.scrollTop = chat.scrollHeight;
     });
@@ -431,3 +420,8 @@ function toggleStatus() {
 
 
 
+const toggleBtn = document.getElementById("toggleAside");
+const aside = document.querySelector("aside");
+toggleBtn.addEventListener("click", () => {
+    aside.classList.toggle("active");
+})
