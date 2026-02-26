@@ -189,19 +189,54 @@ function renderizarMensagem(dados, id) {
     msgBox.setAttribute('data-visibility', dados.visibility ? 'publica' : 'privada');
     msgBox.setAttribute("role", "article");
     msgBox.setAttribute("aria-label", `Nova mensagem de ${user.textContent}: ${dados.message_text}`);
+    msgBox.setAttribute("tabindex", "0");
 
     chat.appendChild(msgBox);
     chat.scrollTop = chat.scrollHeight;
 
     const audio = document.getElementById("beep");
     if(audio) audio.play().catch(e => console.log("Autoplay bloqueado pelo browser"));
+} 
+
+
+
+
+chat.addEventListener("click", selectMessage);
+chat.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    selectMessage(event);
+})
+
+function selectMessage(event)
+{
+
+    const box = event.target.closest(".msgBox");
+
+    if (!box) 
+    {
+        document.querySelectorAll(".msgBox.selected")
+        .forEach(el => el.classList.remove("selected"));
+        return;
+    }
+
+    if (box.classList.contains("selected"))
+    {
+        box.classList.remove("selected");
+    } else {
+        document.querySelectorAll(".msgBox.selected")
+        .forEach(el => el.classList.remove("selected"));
+        box.classList.add("selected");
+
+        document.addEventListener("focusin", (event) => {
+            const selected = document.querySelector(".msgBox.selected");
+            if (!selected) return;
+
+            if (!selected.contains(event.target)){
+                selected.classList.remove("selected");
+            }
+        })
+    }
 }
-
-
-
-
-
-
 
 
 
@@ -211,7 +246,7 @@ const userListContainer = document.getElementById("userList");
 userListContainer.addEventListener("keydown", (event) => {
     if (event.key !== "Enter" && event.key !== " ") return;
     selectUser(event);
-});
+})
 userListContainer.addEventListener("click", selectUser);
 function selectUser(event) {
     const user = event.target.closest(".userBox");
@@ -226,37 +261,22 @@ function selectUser(event) {
 
     if (!selected) {
         user.classList.add("selected");
-
-        const rect = user.getBoundingClientRect();
-        delUserBtn.setAttribute("tabindex", "0");
-        delUserBtn.classList.add("selected");
-        delUserBtn.hidden = false;
-        delUserBtn.style.position = "absolute";
-        delUserBtn.style.top = rect.top + window.scrollY + rect.height / 5 + "px";
-        delUserBtn.style.left = rect.right + 15 + "px";
-        user.appendChild(delUserBtn);
     }
 }
 
 function clearSelection() {
     document.querySelectorAll(".userBox.selected")
         .forEach(el => el.classList.remove("selected"));
-
-    delUserBtn.classList.remove("selected");
-    delUserBtn.hidden = true;
-    delUserBtn.setAttribute("tabindex", "-1");
-    document.body.appendChild(delUserBtn);
 }
 
 document.addEventListener("focusin", (event) => {
     const selected = document.querySelector(".userBox.selected");
     if (!selected) return;
 
-    if (!selected.contains(event.target) &&
-        !delUserBtn.contains(event.target)) {
+    if (!selected.contains(event.target)) {
         clearSelection();
     }
-});
+})
 
 
 
@@ -377,7 +397,6 @@ radiosFiltro.forEach(radio => {
 });
 
 
-
 function inicializarTema() {
     const switchBtn = document.getElementById("switchThemeBtn");
     const temaSalvo = localStorage.getItem("tema");
@@ -402,8 +421,11 @@ function inicializarTema() {
 inicializarTema();
 
 
-
 switchStatusBtn.addEventListener("click", toggleStatus);
+switchStatusBtn.addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    toggleStatus(event);
+})
 function toggleStatus() {
     const statusDesc = document.getElementById("statusDesc");
     if (statusDot.classList.contains('online')) {
